@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GoDecola.API.Model
 {
-    public class Clientes
+    public class User
     {
         public Guid Id { get; set; }
 
