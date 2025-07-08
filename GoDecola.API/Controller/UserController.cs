@@ -1,4 +1,5 @@
-﻿using GoDecola.API.Model;
+﻿using GoDecola.API.DTO;
+using GoDecola.API.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GoDecola.API.Controller
