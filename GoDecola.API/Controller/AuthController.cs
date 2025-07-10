@@ -2,6 +2,7 @@
 using GoDecola.API.DTO.Response;
 using GoDecola.API.Mocks;
 using GoDecola.API.Model;
+using GoDecola.API.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GoDecola.API.Controller
@@ -10,12 +11,12 @@ namespace GoDecola.API.Controller
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly List<MockUser> _mockUsers = new List<MockUser>
+        private readonly IUserService _userService;
+
+        public AuthController(IUserService userService)
         {
-            new MockUser { Email = "client@test.com", Password = "$2a$11$dZHH.pJw034edy91dsgxFOVFP.rytY1cC2UAGdhLspHLHDzgBNBx.", UserType = UserType.Cliente },
-            new MockUser { Email = "admin@test.com", Password = "$2a$11$gWO97LXjLxufTjyywi2ckeUrG0rLLaKCeXgiEFOPx7lQxxSuquWLC", UserType = UserType.Admin },
-            new MockUser { Email = "attendant@test.com", Password = "$2a$11$jK/7T7CXcGjEL.8nBoBzvuQfL021k/EIGFuff6D/EtmZcAxXrvlbW", UserType = UserType.Funcionario }
-        };
+            _userService = userService;
+        }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequestDTO)
@@ -27,9 +28,7 @@ namespace GoDecola.API.Controller
 
             await Task.Delay(100); // simula atraso 
 
-            var userFound = _mockUsers.FirstOrDefault(u =>
-                u.Email.Equals(loginRequestDTO.Email, StringComparison.OrdinalIgnoreCase)
-            );
+            var userFound = _userService.GetUserByEmail(loginRequestDTO.Email);
 
             if (userFound == null)
             {
