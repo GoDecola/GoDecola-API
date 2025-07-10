@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GoDecola.API.DTO
+namespace GoDecola.API.DTO.Request
 {
     public record LoginRequestDTO(
         [Required(ErrorMessage = "Email é obrigatório.")]

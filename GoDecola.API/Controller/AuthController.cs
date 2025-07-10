@@ -1,4 +1,6 @@
-﻿using GoDecola.API.DTO;
+﻿using GoDecola.API.DTO.Request;
+using GoDecola.API.DTO.Response;
+using GoDecola.API.Mocks;
 using GoDecola.API.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +10,11 @@ namespace GoDecola.API.Controller
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly List<dynamic> _mockUsers = new List<dynamic>
+        private readonly List<MockUser> _mockUsers = new List<MockUser>
         {
-            new { Email = "client@test.com", Password = "$2a$11$dZHH.pJw034edy91dsgxFOVFP.rytY1cC2UAGdhLspHLHDzgBNBx.", UserType = "Client" },
-            new { Email = "admin@test.com", Password = "$2a$11$gWO97LXjLxufTjyywi2ckeUrG0rLLaKCeXgiEFOPx7lQxxSuquWLC", UserType = "Administrator" },
-            new { Email = "attendant@test.com", Password = "$2a$11$jK/7T7CXcGjEL.8nBoBzvuQfL021k/EIGFuff6D/EtmZcAxXrvlbW", UserType = "Attendant" }
+            new MockUser { Email = "client@test.com", Password = "$2a$11$dZHH.pJw034edy91dsgxFOVFP.rytY1cC2UAGdhLspHLHDzgBNBx.", UserType = UserType.Cliente },
+            new MockUser { Email = "admin@test.com", Password = "$2a$11$gWO97LXjLxufTjyywi2ckeUrG0rLLaKCeXgiEFOPx7lQxxSuquWLC", UserType = UserType.Admin },
+            new MockUser { Email = "attendant@test.com", Password = "$2a$11$jK/7T7CXcGjEL.8nBoBzvuQfL021k/EIGFuff6D/EtmZcAxXrvlbW", UserType = UserType.Funcionario }
         };
 
         [HttpPost("login")]
@@ -41,11 +43,13 @@ namespace GoDecola.API.Controller
             {
                 string simulatedToken = $"mock_token_para_{userFound.UserType}_{DateTime.Now.Ticks}"; // simula token unico baseado no perfil e tempo
 
-                return Ok(new
-                {
-                    userType = userFound.UserType,
-                    token = simulatedToken
-                });
+                var response = new LoginResponseDTO
+                (
+                    userFound.UserType,
+                    simulatedToken
+                );
+
+                return Ok(response);
             }
             else
             {

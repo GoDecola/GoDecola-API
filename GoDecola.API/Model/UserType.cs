@@ -1,6 +1,6 @@
 ﻿namespace GoDecola.API.Model
 {
-    public enum TipoUsuario
+    public enum UserType
     {
         Cliente,
         Funcionario,
