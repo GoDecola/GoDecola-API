@@ -4,18 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgenciaViagens.Domain.Entities
+namespace GoDecola.Domain.Entities
 {
 
-    public class PackageMedia
+    public class WishList
     {
         public Guid Id { get; set; }
+        public Guid UserId { get; set; }
+        public User? User { get; set; }
+
         public Guid PackageId { get; set; }
         public TravelPackage? Package { get; set; }
-
-        public string MediaType { get; set; } = null!;
-        public string FileName { get; set; } = null!;
-        public string Url { get; set; } = null!;
     }
 
 }

@@ -1,0 +1,6 @@
+@GoDecola.API_HostAddress = http://localhost:5126
+
+GET {{GoDecola.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

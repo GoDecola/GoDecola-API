@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace AgenciaViagens.Infrastructure.Migrations
+namespace GoDecola.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AgenciaViagens.Domain.Entities;
+using GoDecola.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace AgenciaViagens.Infrastructure.Data
+namespace GoDecola.Infrastructure.Data
 {
     public class AppDbContext : DbContext
     {

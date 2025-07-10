@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgenciaViagens.Domain.Entities
+namespace GoDecola.Domain.Entities
 {
 
     public class Reservation

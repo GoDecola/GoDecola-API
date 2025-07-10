@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AgenciaViagens.Domain\AgenciaViagens.Domain.csproj" />
+    <ProjectReference Include="..\GoDecola.Domain\GoDecola.Domain.csproj" />
   </ItemGroup>
 
 </Project>

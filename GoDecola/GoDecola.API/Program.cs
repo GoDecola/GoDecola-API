@@ -1,4 +1,4 @@
-using AgenciaViagens.Infrastructure.Data;
+using GoDecola.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
