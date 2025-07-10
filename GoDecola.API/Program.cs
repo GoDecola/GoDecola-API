@@ -1,27 +1,25 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using AutoMapper;
+using GoDecola.API.Mapper;
 
-// Add services to the container.
+var builder = WebApplication.CreateBuilder(args);
 
+// Serviços
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
+// AutoMapper
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<UserProfile>());
 
-// Configure the HTTP request pipeline.
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
