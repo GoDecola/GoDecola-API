@@ -1,5 +1,8 @@
-﻿using GoDecola.API.DTO;
+﻿using GoDecola.API.DTO.Request;
+using GoDecola.API.DTO.Response;
+using GoDecola.API.Mocks;
 using GoDecola.API.Model;
+using GoDecola.API.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GoDecola.API.Controller
@@ -8,12 +11,12 @@ namespace GoDecola.API.Controller
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly List<dynamic> _mockUsers = new List<dynamic>
+        private readonly IUserService _userService;
+
+        public AuthController(IUserService userService)
         {
-            new { Email = "client@test.com", Password = "$2a$11$dZHH.pJw034edy91dsgxFOVFP.rytY1cC2UAGdhLspHLHDzgBNBx.", UserType = "Client" },
-            new { Email = "admin@test.com", Password = "$2a$11$gWO97LXjLxufTjyywi2ckeUrG0rLLaKCeXgiEFOPx7lQxxSuquWLC", UserType = "Administrator" },
-            new { Email = "attendant@test.com", Password = "$2a$11$jK/7T7CXcGjEL.8nBoBzvuQfL021k/EIGFuff6D/EtmZcAxXrvlbW", UserType = "Attendant" }
-        };
+            _userService = userService;
+        }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequestDTO)
@@ -25,9 +28,7 @@ namespace GoDecola.API.Controller
 
             await Task.Delay(100); // simula atraso 
 
-            var userFound = _mockUsers.FirstOrDefault(u =>
-                u.Email.Equals(loginRequestDTO.Email, StringComparison.OrdinalIgnoreCase)
-            );
+            var userFound = _userService.GetUserByEmail(loginRequestDTO.Email);
 
             if (userFound == null)
             {
@@ -41,11 +42,13 @@ namespace GoDecola.API.Controller
             {
                 string simulatedToken = $"mock_token_para_{userFound.UserType}_{DateTime.Now.Ticks}"; // simula token unico baseado no perfil e tempo
 
-                return Ok(new
-                {
-                    userType = userFound.UserType,
-                    token = simulatedToken
-                });
+                var response = new LoginResponseDTO
+                (
+                    userFound.UserType,
+                    simulatedToken
+                );
+
+                return Ok(response);
             }
             else
             {

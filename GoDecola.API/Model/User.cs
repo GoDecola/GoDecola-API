@@ -11,7 +11,7 @@ namespace GoDecola.API.Model
         public string Senha { get; set; } = string.Empty;
         public string Telefone { get; set; } = string.Empty;
         public string Documento { get; set; } = string.Empty;
-        public TipoUsuario Tipo { get; set; } = TipoUsuario.Cliente;
+        public UserType Tipo { get; set; } = UserType.Cliente;
 
     }
 }

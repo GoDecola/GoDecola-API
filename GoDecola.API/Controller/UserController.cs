@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using GoDecola.API.DTO;
+using GoDecola.API.DTO.Request;
 using GoDecola.API.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +25,7 @@ namespace GoDecola.API.Controller
 
             var newUser = _mapper.Map<User>(newUserDTO);
             newUser.Id = Guid.NewGuid();
-            newUser.Tipo = TipoUsuario.Cliente;
+            newUser.Tipo = UserType.Cliente;
 
             users.Add(newUser);
 

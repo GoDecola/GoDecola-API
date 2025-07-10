@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using GoDecola.API.DTO;
+using GoDecola.API.DTO.Request;
 using GoDecola.API.Model;
 
 namespace GoDecola.API.Mapper

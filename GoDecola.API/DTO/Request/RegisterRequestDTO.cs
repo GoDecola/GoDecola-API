@@ -1,7 +1,7 @@
 ﻿using GoDecola.API.ValidationAttribute;
 using System.ComponentModel.DataAnnotations;
 
-namespace GoDecola.API.DTO
+namespace GoDecola.API.DTO.Request
 {
     public class RegisterRequestDTO
     {
