@@ -2,6 +2,7 @@
 {
     public class HotelAmenities
     {
+        public int Id { get; set; }
         public int TravelPackageId { get; set; }
         public bool Wifi { get; set; }
         public bool Parking { get; set; }
