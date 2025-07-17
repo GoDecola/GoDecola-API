@@ -1,4 +1,4 @@
-﻿namespace GoDecola.API.Entities
+﻿namespace GoDecola.API.Entities.TravelPackage
 {
     public class TravelPackageImage
     {

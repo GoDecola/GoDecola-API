@@ -1,4 +1,6 @@
-﻿using GoDecola.API.Entities;
+﻿using GoDecola.API.Entities.Reservation;
+using GoDecola.API.Entities.TravelPackage;
+using GoDecola.API.Entities.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

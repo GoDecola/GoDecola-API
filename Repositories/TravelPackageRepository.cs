@@ -1,5 +1,5 @@
 ﻿using GoDecola.API.Data;
-using GoDecola.API.Entities;
+using GoDecola.API.Entities.TravelPackage;
 using Microsoft.EntityFrameworkCore;
 
 namespace GoDecola.API.Repositories

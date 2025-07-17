@@ -1,4 +1,4 @@
-﻿using GoDecola.API.Entities;
+﻿using GoDecola.API.Entities.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
