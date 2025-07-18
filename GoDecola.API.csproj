@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="DTOs\" />
+    <Folder Include="Entities\NovaPasta\" />
   </ItemGroup>
 
 </Project>
