@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public int TravelPackageId { get; set; }
+        public TravelPackage TravelPackage { get; set; }
         public bool Wifi { get; set; }
         public bool Parking { get; set; }
         public bool Pool { get; set; }
