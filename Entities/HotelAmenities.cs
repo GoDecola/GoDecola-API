@@ -4,13 +4,13 @@
     {
         public int Id { get; set; }
         public int TravelPackageId { get; set; }
-        public bool Wifi { get; set; }
-        public bool Parking { get; set; }
-        public bool Pool { get; set; }
-        public bool Gym { get; set; }
-        public bool Restaurant { get; set; }
-        public bool PetFriendly { get; set; }
-        public bool AirConditioning { get; set; }
-        public bool BreakfastIncluded { get; set; }
+        public bool HasWifi { get; set; }
+        public bool HasParking { get; set; }
+        public bool HasPool { get; set; }
+        public bool HasGym { get; set; }
+        public bool HasRestaurant { get; set; }
+        public bool HasPetFriendly { get; set; }
+        public bool HasAirConditioning { get; set; }
+        public bool HasBreakfastIncluded { get; set; }
     }
 }
