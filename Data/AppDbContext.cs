@@ -12,8 +12,9 @@ namespace GoDecola.API.Data
         public DbSet<TravelPackage> TravelPackages { get; set; }
         public DbSet<TravelPackageImage> TravelPackageImages { get; set; }
         public DbSet<TravelPackageVideo> TravelPackageVideos { get; set; }
-        public DbSet<Reservation> Reservations { get; set; }
         public DbSet<HotelAmenities> HotelAmenities { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Guests> Guests { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -42,6 +43,12 @@ namespace GoDecola.API.Data
                 .HasMany(tp => tp.Videos) // Configura a relação de um para muitos com TravelPackageVideo
                 .WithOne(tpv => tpv.TravelPackage) // Propriedade de navegação inversa
                 .HasForeignKey(tpv => tpv.TravelPackageId) // fk
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<TravelPackage>()
+                .HasOne(tp => tp.Amenities) // Configura a relação de um para um com HotelAmenities
+                .WithOne(ha => ha.TravelPackage) // Propriedade de navegação inversa
+                .HasForeignKey<HotelAmenities>(ha => ha.TravelPackageId) // fk
                 .OnDelete(DeleteBehavior.Cascade);
 
             // ------------------- RESERVATIONS ----------------------
