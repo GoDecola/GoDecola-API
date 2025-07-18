@@ -1,12 +1,19 @@
 using GoDecola.API.Data;
 using GoDecola.API.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var secretKey = builder.Configuration["Jwt:SecretKey"];
+
+var key = Encoding.ASCII.GetBytes(secretKey);
 
 // Configura DbContext
 builder.Services.AddDbContext<AppDbContext>(
@@ -19,6 +26,27 @@ builder.Services.AddDbContext<AppDbContext>(
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+
+// Configura o JwtService
+builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }
+    )
+    .AddJwtBearer(options =>
+        {
+            options.RequireHttpsMetadata = false; // alterar para true em produção
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false, // alterar para true em produção
+                ValidateAudience = false, // alterar para true em produção
+            };
+        }
+    );
 
 // Add services to the container.
 builder.Services.AddControllers();
