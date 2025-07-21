@@ -1,5 +1,8 @@
 using GoDecola.API.Data;
 using GoDecola.API.Entities;
+using GoDecola.API.Profiles;
+using GoDecola.API.Repositories;
+using GoDecola.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -33,20 +36,44 @@ builder.Services.AddAuthentication(options =>
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }
-    )
-    .AddJwtBearer(options =>
+)
+.AddJwtBearer(
+    options =>
+    {
+        options.RequireHttpsMetadata = false; // alterar para true em produção
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            options.RequireHttpsMetadata = false; // alterar para true em produção
-            options.SaveToken = true;
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuer = false, // alterar para true em produção
-                ValidateAudience = false, // alterar para true em produção
-            };
-        }
-    );
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false, // alterar para true em produção
+            ValidateAudience = false, // alterar para true em produção
+        };
+    }
+);
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
+// Repositories
+builder.Services.AddScoped<IRepository<User, string>, UserRepository>();
+builder.Services.AddScoped<IRepository<TravelPackage, int>, TravelPackageRepository>();
+builder.Services.AddScoped<IRepository<Reservation, int>, ReservationRepository>();
+
+// JwtService
+builder.Services.AddSingleton(new JwtService(secretKey));
+
+// CORS
+builder.Services.AddCors(
+    options =>
+    {
+        options.AddPolicy("AllowAllOrigins",
+            policy => 
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader());
+    }
+);
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -55,6 +82,8 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseCors("AllowAllOrigins");
 
 // SeedData
 using (var scope = app.Services.CreateScope())
@@ -75,13 +104,15 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-    // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-        app.MapOpenApi();
-    }
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.MapOpenApi();
+}
+
+app.UseAuthentication();
 
 app.UseHttpsRedirection();
 

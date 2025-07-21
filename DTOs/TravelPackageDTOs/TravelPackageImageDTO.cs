@@ -8,6 +8,5 @@ namespace GoDecola.API.DTOs.TravelPackageDTOs
         public int TravelPackageId { get; set; } // fk
         public string? PhotoUrl { get; set; }
         public DateTime UploadDate { get; set; } = DateTime.UtcNow;
-        public TravelPackage? TravelPackage { get; set; } // propriedade de navegação
     }
 }
