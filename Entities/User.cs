@@ -7,6 +7,6 @@ namespace GoDecola.API.Entities
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Document { get; set; }
-
+        ICollection<Reservation>? Reservations { get; set; } // lista de reservas associadas ao usuário
     }
 }
