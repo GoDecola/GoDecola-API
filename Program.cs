@@ -56,6 +56,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// SeedData
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

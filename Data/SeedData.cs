@@ -59,6 +59,97 @@ namespace GoDecola.API.Data
                     await userManager.AddToRoleAsync(attendantUser, "ATTENDANT");
                 }
             }
+
+            if (!context.TravelPackages.Any())
+            {
+                context.TravelPackages.AddRange(new[]
+                {
+                    new TravelPackage
+                    {
+                        Title = "Hotel Fazenda em Socorro",
+                        Description = "Desfrute de um final de semana relaxante em um hotel fazenda em Socorro, SP. Inclui café da manhã, almoço e jantar.",
+                        Price = 589.0,
+                        Destination = "Socorro, SP",
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(5),
+                        NumberGuests = 2,
+                        NumberBaths = 1,
+                        NumberBeds = 1,
+                        Amenities = new HotelAmenities
+                        {
+                            HasAirConditioning = true,
+                            HasWifi = true,
+                            HasParking = true,
+                            HasPool = true,
+                            HasGym = true,
+                            HasRestaurant = true,
+                            HasBreakfastIncluded = true,
+                            HasPetFriendly = false,
+                        },
+                        Images = new List<TravelPackageImage>
+                        {
+                            new TravelPackageImage { PhotoUrl = "https://hansenimoveis.com/wp-content/uploads/2022/02/CO653-3.jpg%22", UploadDate = DateTime.UtcNow },
+                        }, 
+                    },
+                    new TravelPackage 
+                    { 
+
+                        Title = "Casa de Praia em Ubatuba",
+                        Description = "Bonita casa de praia em Ubatuba",
+                        Price = 560.0,
+                        Destination = "Ubatuba, SP",
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(3),
+                        NumberGuests = 6,
+                        NumberBaths = 2,
+                        NumberBeds = 4,
+                        Amenities = new HotelAmenities
+                        {
+                            HasAirConditioning = true,
+                            HasWifi = true,
+                            HasParking = true,
+                            HasPool = true,
+                            HasGym = false,
+                            HasRestaurant = true,
+                            HasBreakfastIncluded = true,
+                            HasPetFriendly = false,
+                        },
+                        Images = new List<TravelPackageImage>
+                        {
+                            new TravelPackageImage { PhotoUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSacQlg6kYF4qTkWf80HRLnhvHSt6bvIWho8A&s%22", UploadDate = DateTime.UtcNow },
+                        },
+                    },
+                    new TravelPackage
+                    {
+                        Title = "Cultura e gastronomia no Japão",
+                        Description = "Passeio por Tokyo",
+                        Price = 2200.0,
+                        Destination = "Tokyo",
+                        StartDate = DateTime.Now.AddMonths(1),
+                        EndDate = DateTime.Now.AddMonths(1).AddDays(7),
+                        NumberGuests = 2,
+                        NumberBaths = 1,
+                        NumberBeds = 1,
+                        Amenities = new HotelAmenities
+                        {
+                            HasAirConditioning = true,
+                            HasWifi = true,
+                            HasParking = true,
+                            HasPool = false, // Exemplo de alteração
+                            HasGym = false,
+                            HasRestaurant = true,
+                            HasBreakfastIncluded = true,
+                            HasPetFriendly = false,
+                        },
+                        Images = new List<TravelPackageImage>
+                        {
+                            new TravelPackageImage { PhotoUrl = "https://thumbs.dreamstime.com/b/vida-noturna-em-dotonbori-osaka-kansai-japan-267022014.jpg%22", UploadDate = DateTime.UtcNow },
+                        }
+                    }
+                });
+            }
+
+            await context.SaveChangesAsync();
         }
     }
 }
