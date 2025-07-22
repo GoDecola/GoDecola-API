@@ -1,4 +1,5 @@
 ﻿using GoDecola.API.Entities;
+using GoDecola.API.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -86,10 +87,10 @@ namespace GoDecola.API.Data
                             HasBreakfastIncluded = true,
                             HasPetFriendly = false,
                         },
-                        Images = new List<TravelPackageImage>
+                        Medias = new List<TravelPackageMedia>
                         {
-                            new TravelPackageImage { PhotoUrl = "https://hansenimoveis.com/wp-content/uploads/2022/02/CO653-3.jpg%22", UploadDate = DateTime.UtcNow },
-                        }, 
+                            new TravelPackageMedia { MediaUrl = "https://hansenimoveis.com/wp-content/uploads/2022/02/CO653-3.jpg", UploadDate = DateTime.UtcNow, MediaType = MediaType.Image },
+                        } 
                     },
                     new TravelPackage 
                     { 
@@ -114,10 +115,10 @@ namespace GoDecola.API.Data
                             HasBreakfastIncluded = true,
                             HasPetFriendly = false,
                         },
-                        Images = new List<TravelPackageImage>
+                        Medias = new List<TravelPackageMedia>
                         {
-                            new TravelPackageImage { PhotoUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSacQlg6kYF4qTkWf80HRLnhvHSt6bvIWho8A&s%22", UploadDate = DateTime.UtcNow },
-                        },
+                            new TravelPackageMedia { MediaUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSacQlg6kYF4qTkWf80HRLnhvHSt6bvIWho8A&s", UploadDate = DateTime.UtcNow, MediaType = MediaType.Image },
+                        }
                     },
                     new TravelPackage
                     {
@@ -141,9 +142,9 @@ namespace GoDecola.API.Data
                             HasBreakfastIncluded = true,
                             HasPetFriendly = false,
                         },
-                        Images = new List<TravelPackageImage>
+                        Medias = new List<TravelPackageMedia>
                         {
-                            new TravelPackageImage { PhotoUrl = "https://thumbs.dreamstime.com/b/vida-noturna-em-dotonbori-osaka-kansai-japan-267022014.jpg%22", UploadDate = DateTime.UtcNow },
+                            new TravelPackageMedia { MediaUrl = "https://thumbs.dreamstime.com/b/vida-noturna-em-dotonbori-osaka-kansai-japan-267022014.jpg", UploadDate = DateTime.UtcNow, MediaType = MediaType.Image },
                         }
                     }
                 });

@@ -8,8 +8,7 @@ namespace GoDecola.API.Data
     public class AppDbContext : IdentityDbContext<User>
     {
         public DbSet<TravelPackage> TravelPackages { get; set; }
-        public DbSet<TravelPackageImage> TravelPackageImages { get; set; }
-        public DbSet<TravelPackageVideo> TravelPackageVideos { get; set; }
+        public DbSet<TravelPackageMedia> TravelPackageMedias { get; set; }
         public DbSet<HotelAmenities> HotelAmenities { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Guests> Guests { get; set; }
@@ -32,16 +31,10 @@ namespace GoDecola.API.Data
             // ------------------- TRAVEL PACKAGES -------------------
 
             builder.Entity<TravelPackage>()
-                .HasMany(tp => tp.Images) // um pacote de viagem pode ter várias imagens
-                .WithOne(tpi => tpi.TravelPackage) // Propriedade de navegação inversa
-                .HasForeignKey(tpi => tpi.TravelPackageId) // fk
-                .OnDelete(DeleteBehavior.Cascade); // se o pacote for excluído, as imagens também serão excluídas
-
-            builder.Entity<TravelPackage>()
-                .HasMany(tp => tp.Videos) // um pacote de viagem pode ter vários vídeos
-                .WithOne(tpv => tpv.TravelPackage) // Propriedade de navegação inversa
-                .HasForeignKey(tpv => tpv.TravelPackageId) // fk
-                .OnDelete(DeleteBehavior.Cascade); // se o pacote for excluído, os vídeos também serão excluídos
+                .HasMany(tp => tp.Medias) // um pacote de viagem pode ter várias mídias
+                .WithOne(tpm => tpm.TravelPackage) // Propriedade de navegação inversa
+                .HasForeignKey(tpm => tpm.TravelPackageId) // fk
+                .OnDelete(DeleteBehavior.Cascade); // exclui mídias se o pacote for excluído
 
             builder.Entity<TravelPackage>()
                 .HasOne(tp => tp.Amenities) // Configura a relação de um para um com HotelAmenities
