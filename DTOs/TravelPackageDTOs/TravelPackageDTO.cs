@@ -16,7 +16,6 @@ namespace GoDecola.API.DTOs.TravelPackageDTOs
         public int NumberBeds { get; set; }
         public HotelAmenitiesDTO Amenities { get; set; } = new HotelAmenitiesDTO();
         public string? Location { get; set; }
-        public ICollection<TravelPackageImageDTO> Images { get; set; }
-        public ICollection<TravelPackageVideoDTO> Videos { get; set; }
+        public ICollection<TravelPackageMediaDTO> MediasUrl { get; set; } = new List<TravelPackageMediaDTO>();
     }
 }

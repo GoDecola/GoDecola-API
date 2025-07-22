@@ -13,5 +13,6 @@
         public int NumberBeds { get; set; }
         public HotelAmenitiesDTO Amenities { get; set; } = new HotelAmenitiesDTO();
         public string? Location { get; set; }
+        public ICollection<TravelPackageMediaDTO> MediasUrl { get; set; } = new List<TravelPackageMediaDTO>();
     }
 }

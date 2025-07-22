@@ -14,8 +14,6 @@
         public int NumberBeds { get; set; }
         public HotelAmenities Amenities { get; set; } = new HotelAmenities();
         public string? Location { get; set; }
-        public ICollection<TravelPackageImage>? Images { get; set; } = new List<TravelPackageImage>();
-        public ICollection<TravelPackageVideo>? Videos { get; set; } = new List<TravelPackageVideo>();
-
+        public ICollection<TravelPackageMedia> Medias { get; set; } = new List<TravelPackageMedia>();
     }
 }
