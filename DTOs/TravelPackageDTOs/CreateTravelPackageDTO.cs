@@ -1,4 +1,6 @@
-﻿namespace GoDecola.API.DTOs.TravelPackageDTOs
+﻿using GoDecola.API.Enums;
+
+namespace GoDecola.API.DTOs.TravelPackageDTOs
 {
     public class CreateTravelPackageDTO
     {
@@ -9,10 +11,12 @@
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int NumberGuests { get; set; }
-        public int NumberBaths { get; set; }
-        public int NumberBeds { get; set; }
-        public HotelAmenitiesDTO Amenities { get; set; } = new HotelAmenitiesDTO();
-        public string? Location { get; set; }
+        public AccommodationDTO AccommodationDetails { get; set; } = new AccommodationDTO();
         public ICollection<TravelPackageMediaDTO> MediasUrl { get; set; } = new List<TravelPackageMediaDTO>();
+        public bool IsActive { get; set; }
+        public double? DiscountPercentage { get; set; }
+        public DateTime? PromotionStartDate { get; set; }
+        public DateTime? PromotionEndDate { get; set; }
+        public PackageType PackageType { get; set; }
     }
 }
