@@ -64,7 +64,7 @@ namespace GoDecola.API.Controllers
                 return Unauthorized("Senha inválida");
             }
 
-            var token = _jwtService.GenerateToken(user);
+            var token = await _jwtService.GenerateToken(user);
 
             return Ok(
                 new LoginResponseDTO
