@@ -35,6 +35,12 @@ namespace GoDecola.API.Profiles
             CreateMap<GuestsDTO, Guests>() // mapeamento para GuestsDTO para Guests (se precisar de input)
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ReservationId, opt => opt.Ignore()); // ignora fk em mapeamento de entrada
+
+            CreateMap<User, UserDTO>(); // Mapeamento para atualização
+
+            CreateMap<UpdateUserDTO, User>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Document, opt => opt.Ignore());
         }
     }
 }
