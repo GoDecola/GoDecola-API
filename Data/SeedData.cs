@@ -1,4 +1,5 @@
 ﻿using GoDecola.API.Entities;
+using GoDecola.API.Entities.TravelPackage;
 using GoDecola.API.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

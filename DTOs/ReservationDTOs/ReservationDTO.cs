@@ -1,4 +1,5 @@
 ﻿using GoDecola.API.Entities;
+using GoDecola.API.Entities.Reservation;
 
 namespace GoDecola.API.DTOs.ReservationDTOs
 {
