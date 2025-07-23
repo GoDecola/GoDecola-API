@@ -1,30 +1,41 @@
 ﻿using GoDecola.API.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace GoDecola.API.Services
 {
     public class JwtService
     {
         private readonly string _secretKey;
+        private readonly UserManager<User> _userManager;
 
-        public JwtService(string secretKey)
+        public JwtService(string secretKey, UserManager<User> userManager)
         {
             _secretKey = secretKey;
+            _userManager = userManager;
         }
 
-        public string GenerateToken(User user)
+        public async Task<string> GenerateToken(User user)
         {
             var key = Encoding.ASCII.GetBytes(_secretKey); 
 
-            var claims = new[]
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
             };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

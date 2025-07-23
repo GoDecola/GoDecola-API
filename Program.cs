@@ -18,6 +18,16 @@ var secretKey = builder.Configuration["Jwt:SecretKey"];
 
 var key = Encoding.ASCII.GetBytes(secretKey);
 
+builder.Services.AddScoped<JwtService>(
+    serviceProvider =>
+    {
+        // injeta o UserManager<User> no JwtService
+        var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+
+        return new JwtService(secretKey, userManager);
+    }
+);
+
 // Configura DbContext
 builder.Services.AddDbContext<AppDbContext>(
         options => options.UseSqlServer(
@@ -29,30 +39,6 @@ builder.Services.AddDbContext<AppDbContext>(
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
-
-builder.Services.AddAuthentication(
-    options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    }
-)
-.AddJwtBearer(
-    options =>
-    {
-        options.RequireHttpsMetadata = false; // alterar para true em producao
-        options.SaveToken = true;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false, // alterar para true em producao
-            ValidateAudience = false, // alterar para true em producao
-            ClockSkew = TimeSpan.Zero // reduz o tempo de tolerancia para 0, para evitar problemas com tokens expirados
-
-        };
-    }
-);
 
 // Configura o JwtService
 builder.Services.AddAuthentication(options =>
@@ -83,9 +69,6 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Services.AddScoped<IRepository<User, string>, UserRepository>();
 builder.Services.AddScoped<IRepository<TravelPackage, int>, TravelPackageRepository>();
 builder.Services.AddScoped<IRepository<Reservation, int>, ReservationRepository>();
-
-// JwtService
-builder.Services.AddSingleton(new JwtService(secretKey));
 
 // CORS
 builder.Services.AddCors(
