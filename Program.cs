@@ -30,6 +30,30 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddAuthentication(
+    options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    }
+)
+.AddJwtBearer(
+    options =>
+    {
+        options.RequireHttpsMetadata = false; // alterar para true em producao
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false, // alterar para true em producao
+            ValidateAudience = false, // alterar para true em producao
+            ClockSkew = TimeSpan.Zero // reduz o tempo de tolerancia para 0, para evitar problemas com tokens expirados
+
+        };
+    }
+);
+
 // Configura o JwtService
 builder.Services.AddAuthentication(options =>
         {
