@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using GoDecola.API.Entities;
 using GoDecola.API.DTOs;
 using GoDecola.API.DTOs.UserDTOs;
 using GoDecola.API.DTOs.TravelPackageDTOs;
 using GoDecola.API.DTOs.ReservationDTOs;
-using GoDecola.API.Entities;
 
 namespace GoDecola.API.Profiles
 {
