@@ -1,4 +1,6 @@
-﻿namespace GoDecola.API.Entities
+﻿using GoDecola.API.Enums;
+
+namespace GoDecola.API.Entities
 {
     public class TravelPackage
     {
@@ -10,10 +12,12 @@
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int NumberGuests { get; set; }
-        public int NumberBaths { get; set; }
-        public int NumberBeds { get; set; }
-        public HotelAmenities Amenities { get; set; } = new HotelAmenities();
-        public string? Location { get; set; }
+        public AccommodationDetails AccommodationDetails { get; set; } = new AccommodationDetails();
         public ICollection<TravelPackageMedia> Medias { get; set; } = new List<TravelPackageMedia>();
+        public PackageType PackageType { get; set; }
+
+        public double? DiscountPercentage { get; set; } // ex: 0.10 para 10% de desconto
+        public DateTime? PromotionStartDate { get; set; }
+        public DateTime? PromotionEndDate { get; set; }
     }
 }
