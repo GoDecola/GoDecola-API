@@ -86,7 +86,46 @@ builder.Services.AddCors(
 builder.Services.AddControllers();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(
+        sw =>
+        {
+            sw.SwaggerDoc(
+                "v1",
+                new OpenApiInfo
+                {
+                    Title = "API Cafeteria",
+                    Version = "v1"
+                }
+            );
+            sw.AddSecurityDefinition(
+                "Bearer",
+                new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Insira o token JWT no campo de texto abaixo. Exemplo: Bearer {seu_token_jwt}"
+                }
+            );
+            sw.AddSecurityRequirement(
+                new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                }
+            );
+        }
+);
 
 var app = builder.Build();
 
