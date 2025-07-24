@@ -17,13 +17,17 @@ namespace GoDecola.API.Repositories
         {
             return await _context.TravelPackages
                 .Include(tp => tp.Medias) // inclui as midias relacionadas
+                .Include(tp => tp.AccommodationDetails) // inclui os detalhes de acomodação
+                    .ThenInclude(ad => ad.Address) // inclui o endereço relacionado aos detalhes de acomodação
                 .ToListAsync(); // lista todos os pacotes de viagem
         }
 
         public async Task<TravelPackage?> GetByIdAsync(int id)
         {
             return await _context.TravelPackages
-                .Include(tp => tp.Medias) // inclui as imagens relacionadas
+                .Include(tp => tp.Medias) 
+                .Include(tp => tp.AccommodationDetails) 
+                    .ThenInclude(ad => ad.Address) 
                 .FirstOrDefaultAsync(tp => tp.Id == id); // busca pelo Id
         }
 

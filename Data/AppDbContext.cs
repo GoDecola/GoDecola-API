@@ -9,7 +9,8 @@ namespace GoDecola.API.Data
     {
         public DbSet<TravelPackage> TravelPackages { get; set; }
         public DbSet<TravelPackageMedia> TravelPackageMedias { get; set; }
-        public DbSet<HotelAmenities> HotelAmenities { get; set; }
+        public DbSet<AccommodationDetails> AccommodationDetails { get; set; }
+        public DbSet<Address> Addresses { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Guests> Guests { get; set; }
 
@@ -37,9 +38,15 @@ namespace GoDecola.API.Data
                 .OnDelete(DeleteBehavior.Cascade); // exclui mídias se o pacote for excluído
 
             builder.Entity<TravelPackage>()
-                .HasOne(tp => tp.Amenities) // Configura a relação de um para um com HotelAmenities
+                .HasOne(tp => tp.AccommodationDetails) // Configura a relação de um para um com AccommodationDetails
                 .WithOne() // Propriedade de navegação inversa
-                .HasForeignKey<HotelAmenities>(ha => ha.TravelPackageId) // fk
+                .HasForeignKey<AccommodationDetails>(ha => ha.TravelPackageId) // fk
+                .IsRequired();
+
+            builder.Entity<AccommodationDetails>()
+                .HasOne(ad => ad.Address) // uma acomodação tem 01 endereço
+                .WithOne() // 01 endereço pode ter apenas uma acomodação
+                .HasForeignKey<AccommodationDetails>(ad => ad.AddressId) // fk
                 .IsRequired();
 
             // ------------------- RESERVATIONS ----------------------

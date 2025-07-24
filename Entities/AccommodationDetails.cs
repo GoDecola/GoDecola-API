@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public int TravelPackageId { get; set; }
+        public int AddressId { get; set; } // fk para o endereço
         public int NumberBaths { get; set; }
         public int NumberBeds { get; set; }
         public bool HasWifi { get; set; }

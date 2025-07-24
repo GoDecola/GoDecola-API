@@ -13,15 +13,23 @@ namespace GoDecola.API.Profiles
         {
             CreateMap<User, UserDTO>();
             CreateMap<CreateUserDTO, User>();
+            CreateMap<UpdateUserDTO, User>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Document, opt => opt.Ignore());
 
-            CreateMap<TravelPackage, TravelPackageDTO>();
+            CreateMap<TravelPackage, TravelPackageDTO>()
+                .ForMember(dest => dest.IsCurrentylOnPromotion, opt => opt.MapFrom(src => src.IsCurrentlyOnPromotion)); // mapeia a propriedade IsCurrentlyOnPromotion do TravelPackage para IsCurrentylOnPromotion do TravelPackageDTO
             CreateMap<CreateTravelPackageDTO, TravelPackage>();
             CreateMap<UpdateTravelPackageDTO, TravelPackage>();
 
-            CreateMap<HotelAmenities, HotelAmenitiesDTO>();
-            CreateMap<HotelAmenitiesDTO, HotelAmenities>()
+            CreateMap<AccommodationDetails, AccommodationDTO>();
+            CreateMap<AccommodationDTO, AccommodationDetails>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.TravelPackageId, opt => opt.Ignore());
+
+            CreateMap<Address, AddressDTO>();
+            CreateMap<AddressDTO, Address>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
 
             CreateMap<TravelPackageMedia, TravelPackageMediaDTO>();
             CreateMap<TravelPackageMediaDTO, TravelPackageMedia>()
@@ -35,12 +43,6 @@ namespace GoDecola.API.Profiles
             CreateMap<GuestsDTO, Guests>() // mapeamento para GuestsDTO para Guests (se precisar de input)
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ReservationId, opt => opt.Ignore()); // ignora fk em mapeamento de entrada
-
-            CreateMap<User, UserDTO>(); // Mapeamento para atualização
-
-            CreateMap<UpdateUserDTO, User>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Document, opt => opt.Ignore());
         }
     }
 }
