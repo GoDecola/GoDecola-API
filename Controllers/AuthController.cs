@@ -34,6 +34,7 @@ namespace GoDecola.API.Controllers
             {
                 FirstName = register.FirstName,
                 LastName = register.LastName,
+                UserName = register.Email,
                 Email = register.Email,
             };
 

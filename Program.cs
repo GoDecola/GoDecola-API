@@ -93,7 +93,7 @@ builder.Services.AddSwaggerGen(
                 "v1",
                 new OpenApiInfo
                 {
-                    Title = "API Cafeteria",
+                    Title = "API GoDecola",
                     Version = "v1"
                 }
             );
