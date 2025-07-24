@@ -13,15 +13,13 @@ namespace GoDecola.API.Controllers
     [ApiController]
     public class TravelPackageController : ControllerBase
     {
-        private readonly TravelPackageRepository _travelPackageRepository;
+        private readonly IRepository<TravelPackage, int> _travelPackageRepository;
         private readonly IMapper _mapper;
-        private readonly UserManager<User> _userManager;
 
-        public TravelPackageController(TravelPackageRepository travelPackageRepository, IMapper mapper, UserManager<User> userManager)
+        public TravelPackageController(IRepository<TravelPackage, int> travelPackageRepository, IMapper mapper)
         {
             _travelPackageRepository = travelPackageRepository;
             _mapper = mapper;
-            _userManager = userManager;
         }
 
         [HttpGet]
