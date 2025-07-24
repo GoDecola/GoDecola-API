@@ -1,9 +1,12 @@
 ﻿namespace GoDecola.API.Entities
 {
-    public class HotelAmenities
+    public class AccommodationDetails
     {
         public int Id { get; set; }
         public int TravelPackageId { get; set; }
+        public int AddressId { get; set; } // fk para o endereço
+        public int NumberBaths { get; set; }
+        public int NumberBeds { get; set; }
         public bool HasWifi { get; set; }
         public bool HasParking { get; set; }
         public bool HasPool { get; set; }
@@ -12,5 +15,6 @@
         public bool HasPetFriendly { get; set; }
         public bool HasAirConditioning { get; set; }
         public bool HasBreakfastIncluded { get; set; }
+        public Address? Address { get; set; } // propriedade de navegação para o endereço
     }
 }

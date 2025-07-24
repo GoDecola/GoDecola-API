@@ -1,4 +1,5 @@
 ﻿using GoDecola.API.Entities;
+using GoDecola.API.Enums;
 
 namespace GoDecola.API.DTOs.TravelPackageDTOs
 {
@@ -11,11 +12,15 @@ namespace GoDecola.API.DTOs.TravelPackageDTOs
         public string? Destination { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public bool IsActive { get; set; }
         public int NumberGuests { get; set; }
-        public int NumberBaths { get; set; }
-        public int NumberBeds { get; set; }
-        public HotelAmenitiesDTO Amenities { get; set; } = new HotelAmenitiesDTO();
-        public string? Location { get; set; }
+        public AccommodationDTO AccommodationDetails { get; set; } = new AccommodationDTO();
         public ICollection<TravelPackageMediaDTO> MediasUrl { get; set; } = new List<TravelPackageMediaDTO>();
+        public PackageType PackageType { get; set; }
+        public bool IsCurrentylOnPromotion { get; set; }
+        public double? DiscountPercentage { get; set; }
+        public DateTime? PromotionStartDate { get; set; }
+        public DateTime? PromotionEndDate { get; set; }
+
     }
 }
