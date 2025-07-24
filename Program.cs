@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Text;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +70,10 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Services.AddScoped<IRepository<User, string>, UserRepository>();
 builder.Services.AddScoped<IRepository<TravelPackage, int>, TravelPackageRepository>();
 builder.Services.AddScoped<IRepository<Reservation, int>, ReservationRepository>();
+
+// Configura Stripe
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe")["SecretKey"]; // Configura a chave secreta da Stripe
 
 // CORS
 builder.Services.AddCors(
