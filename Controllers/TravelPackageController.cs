@@ -17,6 +17,13 @@ namespace GoDecola.API.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
 
+        public TravelPackageController(TravelPackageRepository travelPackageRepository, IMapper mapper, UserManager<User> userManager)
+        {
+            _travelPackageRepository = travelPackageRepository;
+            _mapper = mapper;
+            _userManager = userManager;
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TravelPackageDTO>>> GetAll()
         {
