@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GoDecola.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -25,7 +25,7 @@ namespace GoDecola.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost("create")]
+        [HttpPost]
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Create(CreateUserDTO registro)
         {
@@ -46,7 +46,7 @@ namespace GoDecola.API.Controllers
                 new { id = novoUsuario.Id }, _mapper.Map<UserDTO>(novoUsuario));
         }
 
-        [HttpGet("getall")]
+        [HttpGet]
         [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetAll()
         {
@@ -54,7 +54,7 @@ namespace GoDecola.API.Controllers
             return Ok(_mapper.Map<IEnumerable<UserDTO>>(usuarios));
         }
 
-        [HttpGet("getbyid/{id}")]
+        [HttpGet("{id}")]
         [Authorize(Roles = "ADMIN,User")]
         public async Task<ActionResult<UserDTO>> GetById(string id)
         {
@@ -66,7 +66,7 @@ namespace GoDecola.API.Controllers
         }
 
         // Atualiza os dados - exceto id e documento
-        [HttpPut("update/{id}")]
+        [HttpPut("{id}")]
         [Authorize(Roles = "ADMIN,User")]
         public async Task<IActionResult> Update(string id, UpdateUserDTO dados) 
         {
@@ -90,28 +90,11 @@ namespace GoDecola.API.Controllers
             return NoContent();
         }
         
-        [HttpDelete("delete/id/{id}")]
+        [HttpDelete("{id}")]
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeleteById(string id)
         {
             var usuario = await _userManager.FindByIdAsync(id);
-            if (usuario == null)
-                return NotFound("Usuário não encontrado.");
-
-            var resultado = await _userManager.DeleteAsync(usuario);
-
-            if (!resultado.Succeeded)
-                return BadRequest(resultado.Errors);
-
-            return NoContent();
-        }
-
-     
-        [HttpDelete("delete/document/{document}")]
-        [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> DeleteByDocumento(string document)
-        {
-            var usuario = await _userManager.Users.FirstOrDefaultAsync(u => u.Document == document);
             if (usuario == null)
                 return NotFound("Usuário não encontrado.");
 
