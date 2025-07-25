@@ -2,8 +2,8 @@
 {
     public enum UserType
     {
-        ADMIN = 1,
-        SUPPORT = 2,
-        USER = 3
+        ADMIN = 0,
+        SUPPORT = 1,
+        USER = 2
     }
 }

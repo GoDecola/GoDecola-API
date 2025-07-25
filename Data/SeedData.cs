@@ -11,14 +11,14 @@ namespace GoDecola.API.Data
         {
             await context.Database.MigrateAsync();
 
-            if (!await roleManager.RoleExistsAsync("ADMIN"))
+            if (!await roleManager.RoleExistsAsync(UserType.ADMIN.ToString()))
             {
-                await roleManager.CreateAsync(new IdentityRole("ADMIN"));
+                await roleManager.CreateAsync(new IdentityRole(UserType.ADMIN.ToString()));
             }
 
-            if (!await roleManager.RoleExistsAsync("ATTENDANT"))
+            if (!await roleManager.RoleExistsAsync(UserType.SUPPORT.ToString()))
             {
-                await roleManager.CreateAsync(new IdentityRole("ATTENDANT"));
+                await roleManager.CreateAsync(new IdentityRole(UserType.SUPPORT.ToString()));
             }
 
             var adminUser = await userManager.FindByEmailAsync("admin@godecola.com");
@@ -37,27 +37,27 @@ namespace GoDecola.API.Data
 
                 if (resultado.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(adminUser, "ADMIN");
+                    await userManager.AddToRoleAsync(adminUser, UserType.ADMIN.ToString());
                 }
             }
 
-            var attendantUser = await userManager.FindByEmailAsync("attendant@godecola.com");
+            var supportUser = await userManager.FindByEmailAsync("support@godecola.com");
 
-            if (attendantUser == null)
+            if (supportUser == null)
             {
-                attendantUser = new User
+                supportUser = new User
                 {
-                    UserName = "attendant@godecola.com",
-                    Email = "attendant@godecola.com",
-                    FirstName = "Attendant",
+                    UserName = "support@godecola.com",
+                    Email = "support@godecola.com",
+                    FirstName = "Support",
                     LastName = "GoDecola",
                 };
 
-                var resultado = await userManager.CreateAsync(attendantUser, "GoDecola@123");
+                var resultado = await userManager.CreateAsync(supportUser, "GoDecola@123");
 
                 if (resultado.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(attendantUser, "ATTENDANT");
+                    await userManager.AddToRoleAsync(supportUser, UserType.SUPPORT.ToString());
                 }
             }
 
