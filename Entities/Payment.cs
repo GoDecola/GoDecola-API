@@ -5,6 +5,7 @@ namespace GoDecola.API.Entities
     public class Payment
     {
         public int Id { get; set; }
+        public int StripePaymentIntentId { get; set; } // ID do pagamento no Stripe
         public int ReservationId { get; set; }
         public Reservation? Reservation { get; set; } // Propriedade de navegação 
         public DateTime PaymentDate { get; set; } = DateTime.UtcNow; // Data do pagamento
