@@ -2,6 +2,7 @@
 using GoDecola.API.DTOs;
 using GoDecola.API.DTOs.UserDTOs;
 using GoDecola.API.Entities;
+using GoDecola.API.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http;
@@ -26,7 +27,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = nameof(UserType.ADMIN))]
         public async Task<IActionResult> Create(CreateUserDTO registro)
         {
             var novoUsuario = new User
@@ -47,7 +48,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = nameof(UserType.ADMIN))]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetAll()
         {
             var usuarios = await _userManager.Users.ToListAsync();
@@ -55,7 +56,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "ADMIN,User")]
+        [Authorize(Roles = $"{nameof(UserType.ADMIN)}, {nameof(UserType.USER)}")]
         public async Task<ActionResult<UserDTO>> GetById(string id)
         {
             var usuario = await _userManager.FindByIdAsync(id);
@@ -67,7 +68,7 @@ namespace GoDecola.API.Controllers
 
         // Atualiza os dados - exceto id e documento
         [HttpPut("{id}")]
-        [Authorize(Roles = "ADMIN,User")]
+        [Authorize(Roles = $"{nameof(UserType.ADMIN)}, {nameof(UserType.USER)}")]
         public async Task<IActionResult> Update(string id, UpdateUserDTO dados) 
         {
             var usuario = await _userManager.FindByIdAsync(id);
@@ -91,7 +92,7 @@ namespace GoDecola.API.Controllers
         }
         
         [HttpDelete("{id}")]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = nameof(UserType.ADMIN))]
         public async Task<IActionResult> DeleteById(string id)
         {
             var usuario = await _userManager.FindByIdAsync(id);
@@ -105,5 +106,4 @@ namespace GoDecola.API.Controllers
 
             return NoContent();
         }
-    }
 }
