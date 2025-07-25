@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GoDecola.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/travel-packages")]
     [ApiController]
     public class TravelPackageController : ControllerBase
     {

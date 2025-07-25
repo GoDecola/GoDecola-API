@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GoDecola.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/reservations")]
     public class ReservationController : ControllerBase
     {
         private readonly IRepository<Reservation, int> _reservationRepository;
