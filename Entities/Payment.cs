@@ -12,6 +12,7 @@ namespace GoDecola.API.Entities
         public string? Method { get; set; }
         public string? Status { get; set; }
         public float? AmountPaid { get; set; }
+        public string? RedirectUrl { get; set; }
         public string? UrlVoucher { get; set; } // URL do comprovante de pagamento 
     }
 }

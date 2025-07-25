@@ -4,6 +4,7 @@ using GoDecola.API.DTOs;
 using GoDecola.API.DTOs.UserDTOs;
 using GoDecola.API.DTOs.TravelPackageDTOs;
 using GoDecola.API.DTOs.ReservationDTOs;
+using GoDecola.API.DTOs.PaymentDTOs;
 
 namespace GoDecola.API.Profiles
 {
@@ -43,6 +44,15 @@ namespace GoDecola.API.Profiles
             CreateMap<GuestsDTO, Guests>() // mapeamento para GuestsDTO para Guests (se precisar de input)
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ReservationId, opt => opt.Ignore()); // ignora fk em mapeamento de entrada
+
+            CreateMap<Payment, PaymentRequestDTO>(); 
+            CreateMap<PaymentRequestDTO, Payment>();
+
+            CreateMap<Payment, PaymentResponseDTO>()
+                .ForMember(dest => dest.RedirectUrl, opt => opt.MapFrom(src => src.RedirectUrl))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status)) 
+                .ForMember(dest => dest.AmountPaid, opt => opt.MapFrom(src => src.AmountPaid)) 
+                .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate)); 
         }
     }
 }
