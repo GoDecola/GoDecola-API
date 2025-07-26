@@ -70,6 +70,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Services.AddScoped<IRepository<User, string>, UserRepository>();
 builder.Services.AddScoped<IRepository<TravelPackage, int>, TravelPackageRepository>();
 builder.Services.AddScoped<IRepository<Reservation, int>, ReservationRepository>();
+builder.Services.AddScoped<IRepository<Payment, int>, PaymentRepository>();
 
 // Configura Stripe
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));

@@ -16,7 +16,7 @@ namespace GoDecola.API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-         
+
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
 
@@ -106,4 +106,5 @@ namespace GoDecola.API.Controllers
 
             return NoContent();
         }
+    }
 }
