@@ -13,6 +13,7 @@ namespace GoDecola.API.Data
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Guests> Guests { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -68,6 +69,15 @@ namespace GoDecola.API.Data
                 .WithOne()
                 .HasForeignKey(g => g.ReservationId) // fk
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // ------------------- PAYMENTS ----------------------
+
+            builder.Entity<Payment>()
+                .HasOne(p => p.Reservation) // um pagamento tem 01 reserva
+                .WithMany() // 01 reserva pode ter vários pagamentos
+                .HasForeignKey(p => p.ReservationId) // fk
+                .OnDelete(DeleteBehavior.Restrict); // não exclui reserva se houver pagamentos
+
         }
     }
 }
