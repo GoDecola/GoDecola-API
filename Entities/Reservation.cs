@@ -7,7 +7,7 @@
         public int TravelPackageId { get; set; }
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
-        public double TotalPrice { get; set; }
+        public long TotalPrice { get; set; }
         public string? Status { get; set; } = "Pending"; // "Pending", "Confirmed", "Cancelled"
         public DateTime ReservationDate { get; set; } = DateTime.UtcNow;
         public User? User { get; set; } // propriedade de navegação para o usuário

@@ -105,7 +105,7 @@ namespace GoDecola.API.Data
                     {
                         Title = "Hotel Fazenda em Socorro",
                         Description = "Desfrute de um final de semana relaxante em um hotel fazenda em Socorro, SP. Inclui café da manhã, almoço e jantar.",
-                        Price = 589.0,
+                        Price = (long)(589.0 * 100),
                         Destination = "Socorro, SP",
                         StartDate = DateTime.Now,
                         EndDate = DateTime.Now.AddDays(5),
@@ -136,7 +136,7 @@ namespace GoDecola.API.Data
 
                         Title = "Casa de Praia em Ubatuba",
                         Description = "Bonita casa de praia em Ubatuba",
-                        Price = 560.0,
+                        Price = (long)(560.0 * 100),
                         Destination = "Ubatuba, SP",
                         StartDate = DateTime.Now,
                         EndDate = DateTime.Now.AddDays(3),
@@ -169,7 +169,7 @@ namespace GoDecola.API.Data
                     {
                         Title = "Cultura e gastronomia no Japão",
                         Description = "Passeio por Tokyo",
-                        Price = 2200.0,
+                        Price = (long)(2200.0 * 100),
                         Destination = "Tokyo",
                         StartDate = DateTime.Now.AddMonths(1),
                         EndDate = DateTime.Now.AddMonths(1).AddDays(7),
