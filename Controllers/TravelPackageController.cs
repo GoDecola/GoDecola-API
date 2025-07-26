@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GoDecola.API.DTOs.TravelPackageDTOs;
 using GoDecola.API.Entities;
+using GoDecola.API.Enums;
 using GoDecola.API.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GoDecola.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/travel-packages")]
     [ApiController]
     public class TravelPackageController : ControllerBase
     {
@@ -41,7 +42,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = nameof(UserType.ADMIN))] 
         public async Task<IActionResult> Create(CreateTravelPackageDTO travelPackage)
         {
             var newTravelPackage = _mapper.Map<TravelPackage>(travelPackage);
@@ -58,7 +59,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = nameof(UserType.ADMIN))]
         public async Task<IActionResult> Update(int id, UpdateTravelPackageDTO travelPackage)
         {
             var existingTravelPackage = await _travelPackageRepository.GetByIdAsync(id);
@@ -76,7 +77,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = nameof(UserType.ADMIN))]
         public async Task<IActionResult> Delete(int id)
         {
             var travelPackage = await _travelPackageRepository.GetByIdAsync(id);

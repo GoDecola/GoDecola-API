@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GoDecola.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
