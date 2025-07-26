@@ -2,6 +2,7 @@
 using GoDecola.API.DTOs;
 using GoDecola.API.DTOs.UserDTOs;
 using GoDecola.API.Entities;
+using GoDecola.API.Enums;
 using GoDecola.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -43,6 +44,13 @@ namespace GoDecola.API.Controllers
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
+            }
+
+            var roleResult = await _userManager.AddToRoleAsync(user, UserType.USER.ToString());
+
+            if (!roleResult.Succeeded)
+            {
+                return BadRequest(roleResult.Errors);
             }
 
             return Ok(new { message = "Usuário registrado com sucesso!" });

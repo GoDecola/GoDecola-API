@@ -21,6 +21,11 @@ namespace GoDecola.API.Data
                 await roleManager.CreateAsync(new IdentityRole(UserType.SUPPORT.ToString()));
             }
 
+            if (!await roleManager.RoleExistsAsync(UserType.USER.ToString()))
+            {
+                await roleManager.CreateAsync(new IdentityRole(UserType.USER.ToString()));
+            }
+
             var adminUser = await userManager.FindByEmailAsync("admin@godecola.com");
 
             if (adminUser == null)
