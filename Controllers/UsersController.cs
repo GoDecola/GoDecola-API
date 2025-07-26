@@ -15,7 +15,7 @@ namespace GoDecola.API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-         
+
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
 
@@ -66,9 +66,15 @@ namespace GoDecola.API.Controllers
         }
 
         // Atualiza os dados - exceto id e documento
+<<<<<<< Updated upstream
         [HttpPut("update/{id}")]
         [Authorize(Roles = "ADMIN,User")]
         public async Task<IActionResult> Update(string id, UpdateUserDTO dados) 
+=======
+        [HttpPut("{id}")]
+        [Authorize(Roles = $"{nameof(UserType.ADMIN)}, {nameof(UserType.USER)}")]
+        public async Task<IActionResult> Update(string id, UpdateUserDTO dados)
+>>>>>>> Stashed changes
         {
             var usuario = await _userManager.FindByIdAsync(id);
             if (usuario == null)
@@ -89,9 +95,15 @@ namespace GoDecola.API.Controllers
 
             return NoContent();
         }
+<<<<<<< Updated upstream
         
         [HttpDelete("delete/id/{id}")]
         [Authorize(Roles = "ADMIN")]
+=======
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = nameof(UserType.ADMIN))]
+>>>>>>> Stashed changes
         public async Task<IActionResult> DeleteById(string id)
         {
             var usuario = await _userManager.FindByIdAsync(id);
@@ -105,6 +117,7 @@ namespace GoDecola.API.Controllers
 
             return NoContent();
         }
+<<<<<<< Updated upstream
 
      
         [HttpDelete("delete/document/{document}")]
@@ -122,5 +135,7 @@ namespace GoDecola.API.Controllers
 
             return NoContent();
         }
+=======
+>>>>>>> Stashed changes
     }
 }
