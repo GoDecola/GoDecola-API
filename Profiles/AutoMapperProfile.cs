@@ -15,8 +15,7 @@ namespace GoDecola.API.Profiles
             CreateMap<User, UserDTO>();
             CreateMap<CreateUserDTO, User>();
             CreateMap<UpdateUserDTO, User>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Document, opt => opt.Ignore());
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
 
             CreateMap<TravelPackage, TravelPackageDTO>()
                 .ForMember(dest => dest.IsCurrentylOnPromotion, opt => opt.MapFrom(src => src.IsCurrentlyOnPromotion)); // mapeia a propriedade IsCurrentlyOnPromotion do TravelPackage para IsCurrentylOnPromotion do TravelPackageDTO

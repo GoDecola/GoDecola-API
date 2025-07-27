@@ -3,6 +3,7 @@ using GoDecola.API.DTOs.ReservationDTOs;
 using GoDecola.API.DTOs.TravelPackageDTOs;
 using GoDecola.API.DTOs.UserDTOs;
 using GoDecola.API.Entities;
+using GoDecola.API.Enums;
 using GoDecola.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -41,11 +42,11 @@ namespace GoDecola.API.Controllers
             // verificar se travelPackage existe
             var travelPackage = await _travelPackageRepository.GetByIdAsync(createReservation.TravelPackageId);
             if (travelPackage == null)
-                return NotFound("Pacoate de viagens não encontrado.");
+                return NotFound("Pacote de viagens não encontrado.");
 
             // mapear DTO para entidade Reservation
             var reservation = _mapper.Map<Reservation>(createReservation);
-            reservation.Status = "Confirmada";
+            reservation.Status = ReservationStatus.CONFIRMED;
             reservation.TotalPrice = travelPackage.Price;
 
             await _reservationRepository.AddAsync(reservation);
