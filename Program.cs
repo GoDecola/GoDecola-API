@@ -80,7 +80,7 @@ builder.Services.AddScoped<IPaymentService>(provider =>
 
     var stripeOptions = builder.Configuration.GetSection("Stripe").Get<StripeSettings>();
 
-    // URLs definidas no appsettings.json ou fixas aqui (ajuste conforme necessário)
+    // URLs de pgamentos, ajuste conforme necessário
     var successUrl = builder.Configuration["Stripe:SuccessUrl"];
     var cancelUrl = builder.Configuration["Stripe:CancelUrl"];
 
