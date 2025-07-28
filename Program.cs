@@ -72,6 +72,21 @@ builder.Services.AddScoped<IRepository<TravelPackage, int>, TravelPackageReposit
 builder.Services.AddScoped<IRepository<Reservation, int>, ReservationRepository>();
 builder.Services.AddScoped<IRepository<Payment, int>, PaymentRepository>();
 
+// Services
+builder.Services.AddScoped<IPaymentService>(provider =>
+{
+    var reservationRepo = provider.GetRequiredService<IRepository<Reservation, int>>();
+    var paymentRepo = provider.GetRequiredService<IRepository<Payment, int>>();
+
+    var stripeOptions = builder.Configuration.GetSection("Stripe").Get<StripeSettings>();
+
+    // URLs de pgamentos, ajuste conforme necessário
+    var successUrl = builder.Configuration["Stripe:SuccessUrl"];
+    var cancelUrl = builder.Configuration["Stripe:CancelUrl"];
+
+    return new PaymentService(reservationRepo, paymentRepo, stripeOptions, successUrl, cancelUrl);
+});
+
 // Configura Stripe
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
 StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe")["SecretKey"]; // Configura a chave secreta da Stripe
