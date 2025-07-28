@@ -35,7 +35,7 @@ namespace GoDecola.API.Controllers
             }
             catch (Exception ex)
             {
-                // log de erro opcional
+                // log de erro
                 return StatusCode(500, new { error = ex.Message });
             }
         }
