@@ -80,7 +80,9 @@ builder.Services.AddScoped<IPaymentService>(provider =>
 
     var stripeOptions = builder.Configuration.GetSection("Stripe").Get<StripeSettings>();
 
-    // URLs de pgamentos, ajuste conforme necessário
+    // URLs para redirecionamento após o pagamento com Stripe:
+    // - SuccessUrl: para onde o usuário será enviado após pagamento sucedido
+    // - CancelUrl: para onde o usuário será enviado caso cancele o pagamento
     var successUrl = builder.Configuration["Stripe:SuccessUrl"];
     var cancelUrl = builder.Configuration["Stripe:CancelUrl"];
 
