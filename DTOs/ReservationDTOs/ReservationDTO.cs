@@ -6,7 +6,7 @@ namespace GoDecola.API.DTOs.ReservationDTOs
     public class ReservationDTO
     {
         public int Id { get; set; }
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
         public int TravelPackageId { get; set; }
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }

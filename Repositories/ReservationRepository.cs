@@ -1,5 +1,6 @@
 ﻿using GoDecola.API.Data;
 using GoDecola.API.Entities;
+using GoDecola.API.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace GoDecola.API.Repositories
@@ -51,6 +52,33 @@ namespace GoDecola.API.Repositories
                 _context.Reservations.Remove(existingReservation);
                 await _context.SaveChangesAsync();
             }
+        }
+        public async Task<IEnumerable<Reservation>> GetByUserIdAsync(string userId)
+        {
+            var reservations = await _context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.TravelPackage)
+                .Include(r => r.Guests)
+                .Where(r => r.UserId == userId)
+                .ToListAsync();
+
+            var now = DateTime.Now;
+            bool hasChanges = false;
+
+            foreach (var reservation in reservations)
+            {
+                if (reservation.Status == ReservationStatus.CONFIRMED &&
+                    reservation.CheckOutDate.Date < now.Date)
+                {
+                    reservation.Status = ReservationStatus.USED;
+                    hasChanges = true;
+                }
+            }
+
+            if (hasChanges)
+                await _context.SaveChangesAsync();
+
+            return reservations;
         }
     }
 }

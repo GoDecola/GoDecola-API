@@ -3,6 +3,7 @@ using GoDecola.API.DTOs;
 using GoDecola.API.DTOs.UserDTOs;
 using GoDecola.API.Entities;
 using GoDecola.API.Enums;
+using GoDecola.API.Utils;
 using GoDecola.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -28,30 +29,34 @@ namespace GoDecola.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost("signup")] //register de usuário
+        [HttpPost("signup")]
         public async Task<IActionResult> SignUp(CreateUserDTO register)
         {
+            bool cpfValido = !string.IsNullOrWhiteSpace(register.CPF) && ValidationUtils.IsValidCPF(register.CPF);
+            bool rneValido = !string.IsNullOrWhiteSpace(register.RNE) && ValidationUtils.IsValidRNE(register.RNE);
+
+            if (!cpfValido && !rneValido)
+                return BadRequest("É obrigatório informar um CPF ou RNE válido.");
+
             var user = new User
             {
                 FirstName = register.FirstName,
                 LastName = register.LastName,
                 UserName = register.Email,
                 Email = register.Email,
+                CPF = register.CPF,
+                RNE = register.RNE,
+                Passaport = register.Passaport,
             };
 
             var result = await _userManager.CreateAsync(user, register.Password!);
 
             if (!result.Succeeded)
-            {
                 return BadRequest(result.Errors);
-            }
 
-            var roleResult = await _userManager.AddToRoleAsync(user, UserType.USER.ToString());
-
+            var roleResult = await _userManager.AddToRoleAsync(user, "USER");
             if (!roleResult.Succeeded)
-            {
                 return BadRequest(roleResult.Errors);
-            }
 
             return Ok(new { message = "Usuário registrado com sucesso!" });
         }
@@ -88,7 +93,7 @@ namespace GoDecola.API.Controllers
 
         [HttpPost("signout")] //logout do usuário
         [Authorize]
-        public async Task<IActionResult> SignOut()
+        public async Task<IActionResult> SignOut(LoginResponseDTO login)
         {
             await _signInManager.SignOutAsync();
             return Ok(new { message = "Usuário desconectado com sucesso!" });
