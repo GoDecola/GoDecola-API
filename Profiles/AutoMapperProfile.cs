@@ -12,15 +12,20 @@ namespace GoDecola.API.Profiles
     {
         public AutoMapperProfile()
         {
+            // ------------------------ USER ---------------------------------
+
             CreateMap<User, UserDTO>();
             CreateMap<CreateUserDTO, User>();
             CreateMap<UpdateUserDTO, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
 
+            // ------------------------ TRAVEL PACKAGE -------------------------
+
             CreateMap<TravelPackage, TravelPackageDTO>()
-                .ForMember(dest => dest.IsCurrentylOnPromotion, opt => opt.MapFrom(src => src.IsCurrentlyOnPromotion)); // mapeia a propriedade IsCurrentlyOnPromotion do TravelPackage para IsCurrentylOnPromotion do TravelPackageDTO
+                .ForMember(dest => dest.IsCurrentylOnPromotion, opt => opt.MapFrom(src => src.IsCurrentlyOnPromotion)) // mapeia a propriedade IsCurrentlyOnPromotion do TravelPackage para IsCurrentylOnPromotion do TravelPackageDTO
+                .ForMember(dest => dest.MediasUrl, opt => opt.MapFrom(src => src.Medias)); // mapeia a collection de TravelPackageMedia para TravelPackageMediaDTO
             CreateMap<CreateTravelPackageDTO, TravelPackage>();
-            CreateMap<UpdateTravelPackageDTO, TravelPackage>();
+            CreateMap<UpdateTravelPackageDTO, TravelPackage>(); 
 
             CreateMap<AccommodationDetails, AccommodationDTO>();
             CreateMap<AccommodationDTO, AccommodationDetails>()
@@ -36,6 +41,8 @@ namespace GoDecola.API.Profiles
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.TravelPackageId, opt => opt.Ignore());
 
+            // ------------------------ RESERVATION -------------------------
+
             CreateMap<Reservation, ReservationDTO>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
@@ -44,7 +51,9 @@ namespace GoDecola.API.Profiles
             CreateMap<GuestsDTO, Guests>() // mapeamento para GuestsDTO para Guests (se precisar de input)
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ReservationId, opt => opt.Ignore()); // ignora fk em mapeamento de entrada
-                
+
+
+            // ------------------------ PAYMENT ------------------------------
 
             CreateMap<Payment, PaymentRequestDTO>(); 
             CreateMap<PaymentRequestDTO, Payment>();
