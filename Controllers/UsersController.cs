@@ -35,11 +35,11 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = nameof(UserType.ADMIN))]
-        public async Task<IActionResult> Create(CreateUserDTO create)
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> Create(AdminCreateUserDTO create)
         {
-            if (create.Type == null)
-                return BadRequest("Tipo de usuário é obrigatório.");
+            if (string.IsNullOrWhiteSpace(create.Role))
+                return BadRequest("A role é obrigatória (ADMIN, SUPPORT ou USER).");
 
             var novoUsuario = new User
             {
@@ -47,7 +47,9 @@ namespace GoDecola.API.Controllers
                 LastName = create.LastName,
                 UserName = create.Email,
                 Email = create.Email,
-                
+                CPF = create.CPF,
+                RNE = create.RNE,
+                Passaport = create.Passaport
             };
 
             var resultado = await _userManager.CreateAsync(novoUsuario, create.Password!);
@@ -55,7 +57,7 @@ namespace GoDecola.API.Controllers
             if (!resultado.Succeeded)
                 return BadRequest(resultado.Errors);
 
-            var roleResult = await _userManager.AddToRoleAsync(novoUsuario, create.Type.Value.ToString());
+            var roleResult = await _userManager.AddToRoleAsync(novoUsuario, create.Role.ToUpper());
 
             if (!roleResult.Succeeded)
                 return BadRequest(roleResult.Errors);

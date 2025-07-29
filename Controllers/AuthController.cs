@@ -47,7 +47,6 @@ namespace GoDecola.API.Controllers
                 CPF = register.CPF,
                 RNE = register.RNE,
                 Passaport = register.Passaport,
-                Type = UserType.USER
             };
 
             var result = await _userManager.CreateAsync(user, register.Password!);

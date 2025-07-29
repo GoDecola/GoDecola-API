@@ -36,7 +36,6 @@ namespace GoDecola.API.Data
                     Email = "admin@godecola.com",
                     FirstName = "Admin",
                     LastName = "GoDecola",
-                    Type = UserType.ADMIN,
                 };
 
                 var resultado = await userManager.CreateAsync(adminUser, "GoDecola@123");
@@ -57,7 +56,6 @@ namespace GoDecola.API.Data
                     Email = "support@godecola.com",
                     FirstName = "Support",
                     LastName = "GoDecola",
-                    Type = UserType.SUPPORT,
                 };
 
                 var resultado = await userManager.CreateAsync(supportUser, "GoDecola@123");
