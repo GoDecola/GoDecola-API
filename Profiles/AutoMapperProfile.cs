@@ -36,13 +36,15 @@ namespace GoDecola.API.Profiles
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.TravelPackageId, opt => opt.Ignore());
 
-            CreateMap<Reservation, ReservationDTO>();
-            CreateMap<CreateReservationDTO, Reservation>();
+            CreateMap<Reservation, ReservationDTO>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
+            CreateMap<CreateReservationDTO, Reservation>();
             CreateMap<Guests, GuestsDTO>();
             CreateMap<GuestsDTO, Guests>() // mapeamento para GuestsDTO para Guests (se precisar de input)
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ReservationId, opt => opt.Ignore()); // ignora fk em mapeamento de entrada
+                
 
             CreateMap<Payment, PaymentRequestDTO>(); 
             CreateMap<PaymentRequestDTO, Payment>();

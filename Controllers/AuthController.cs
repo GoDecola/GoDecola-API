@@ -55,8 +55,7 @@ namespace GoDecola.API.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
-            var roleResult = await _userManager.AddToRoleAsync(user, UserType.USER.ToString());
-
+            var roleResult = await _userManager.AddToRoleAsync(user, "USER");
             if (!roleResult.Succeeded)
                 return BadRequest(roleResult.Errors);
 

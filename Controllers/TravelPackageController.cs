@@ -42,7 +42,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = nameof(UserType.ADMIN))] 
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Create(CreateTravelPackageDTO travelPackage)
         {
             var newTravelPackage = _mapper.Map<TravelPackage>(travelPackage);
@@ -59,7 +59,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = nameof(UserType.ADMIN))]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Update(int id, UpdateTravelPackageDTO travelPackage)
         {
             var existingTravelPackage = await _travelPackageRepository.GetByIdAsync(id);
@@ -77,7 +77,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = nameof(UserType.ADMIN))]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Delete(int id)
         {
             var travelPackage = await _travelPackageRepository.GetByIdAsync(id);

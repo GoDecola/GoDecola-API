@@ -11,6 +11,6 @@ namespace GoDecola.API.DTOs.UserDTOs
         public string? CPF { get; set; }
         public string? RNE { get; set; }
         public string? Passaport { get; set; }
-        public UserType? Type { get; set; } //Adicionei o nullability aqui para permitir q a mesma DTO sirva pro Signup(AuthController) e pro Create(UsersController)
+
     }
 }

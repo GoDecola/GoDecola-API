@@ -70,7 +70,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = nameof(UserType.ADMIN))]
+        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetAll()
         {
             var usuarios = await _userManager.Users.ToListAsync();
@@ -130,41 +130,8 @@ namespace GoDecola.API.Controllers
         [Authorize(Roles = $"{nameof(UserType.ADMIN)},{nameof(UserType.SUPPORT)},{nameof(UserType.USER)}")]
         public async Task<IActionResult> DeleteById(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound("Usuário não encontrado.");
-
-            var reservations = await _context.Reservations
-                .Where(r => r.UserId == id)
-                .ToListAsync();
-
-            if (reservations.Count == 0)
-            {
-                var result = await _userManager.DeleteAsync(user);
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors);
-
-                return Ok("Usuário excluído com sucesso.");
-            }
-
-            bool allUsed = reservations.All(r => r.Status == ReservationStatus.USED);
-
-            if (!allUsed)
-                return BadRequest("Usuário não pode ser excluído: Há reservas ativas ainda não utilizadas.");
-
-            var deleteResult = await _userManager.DeleteAsync(user);
-
-            if (!deleteResult.Succeeded)
-                return BadRequest(deleteResult.Errors);
-
-            return Ok("Usuário excluído com sucesso.");
-        }
-        [HttpGet("{userId}/reservations")]
-        [Authorize(Roles = $"{nameof(UserType.ADMIN)}, {nameof(UserType.SUPPORT)}, {nameof(UserType.USER)}")]
-        public async Task<IActionResult> GetUserReservations(string userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
+            var usuario = await _userManager.FindByIdAsync(id);
+            if (usuario == null)
                 return NotFound("Usuário não encontrado.");
 
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
