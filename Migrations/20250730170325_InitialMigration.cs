@@ -12,6 +12,27 @@ namespace GoDecola.API.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Addresses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AddressLine1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AddressLine2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Neighborhood = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Latitude = table.Column<double>(type: "float", nullable: true),
+                    Longitude = table.Column<double>(type: "float", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Addresses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -33,15 +54,16 @@ namespace GoDecola.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<double>(type: "float", nullable: false),
+                    Price = table.Column<long>(type: "bigint", nullable: false),
                     Destination = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     NumberGuests = table.Column<int>(type: "int", nullable: false),
-                    NumberBaths = table.Column<int>(type: "int", nullable: false),
-                    NumberBeds = table.Column<int>(type: "int", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    PackageType = table.Column<int>(type: "int", nullable: false),
+                    DiscountPercentage = table.Column<double>(type: "float", nullable: true),
+                    PromotionStartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PromotionEndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -55,7 +77,9 @@ namespace GoDecola.API.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CPF = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RNE = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Passaport = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -98,26 +122,35 @@ namespace GoDecola.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "HotelAmenities",
+                name: "AccommodationDetails",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TravelPackageId = table.Column<int>(type: "int", nullable: false),
-                    Wifi = table.Column<bool>(type: "bit", nullable: false),
-                    Parking = table.Column<bool>(type: "bit", nullable: false),
-                    Pool = table.Column<bool>(type: "bit", nullable: false),
-                    Gym = table.Column<bool>(type: "bit", nullable: false),
-                    Restaurant = table.Column<bool>(type: "bit", nullable: false),
-                    PetFriendly = table.Column<bool>(type: "bit", nullable: false),
-                    AirConditioning = table.Column<bool>(type: "bit", nullable: false),
-                    BreakfastIncluded = table.Column<bool>(type: "bit", nullable: false)
+                    AddressId = table.Column<int>(type: "int", nullable: false),
+                    NumberBaths = table.Column<int>(type: "int", nullable: false),
+                    NumberBeds = table.Column<int>(type: "int", nullable: false),
+                    HasWifi = table.Column<bool>(type: "bit", nullable: false),
+                    HasParking = table.Column<bool>(type: "bit", nullable: false),
+                    HasPool = table.Column<bool>(type: "bit", nullable: false),
+                    HasGym = table.Column<bool>(type: "bit", nullable: false),
+                    HasRestaurant = table.Column<bool>(type: "bit", nullable: false),
+                    HasPetFriendly = table.Column<bool>(type: "bit", nullable: false),
+                    HasAirConditioning = table.Column<bool>(type: "bit", nullable: false),
+                    HasBreakfastIncluded = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_HotelAmenities", x => x.Id);
+                    table.PrimaryKey("PK_AccommodationDetails", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_HotelAmenities_TravelPackages_TravelPackageId",
+                        name: "FK_AccommodationDetails_Addresses_AddressId",
+                        column: x => x.AddressId,
+                        principalTable: "Addresses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AccommodationDetails_TravelPackages_TravelPackageId",
                         column: x => x.TravelPackageId,
                         principalTable: "TravelPackages",
                         principalColumn: "Id",
@@ -125,41 +158,21 @@ namespace GoDecola.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TravelPackageImages",
+                name: "TravelPackageMedias",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TravelPackageId = table.Column<int>(type: "int", nullable: false),
-                    PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MediaUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MediaType = table.Column<int>(type: "int", nullable: false),
                     UploadDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TravelPackageImages", x => x.Id);
+                    table.PrimaryKey("PK_TravelPackageMedias", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TravelPackageImages_TravelPackages_TravelPackageId",
-                        column: x => x.TravelPackageId,
-                        principalTable: "TravelPackages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TravelPackageVideos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TravelPackageId = table.Column<int>(type: "int", nullable: false),
-                    VideoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UploadDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TravelPackageVideos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TravelPackageVideos_TravelPackages_TravelPackageId",
+                        name: "FK_TravelPackageMedias_TravelPackages_TravelPackageId",
                         column: x => x.TravelPackageId,
                         principalTable: "TravelPackages",
                         principalColumn: "Id",
@@ -172,13 +185,13 @@ namespace GoDecola.API.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     TravelPackageId = table.Column<int>(type: "int", nullable: false),
-                    ReservationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TotalPrice = table.Column<double>(type: "float", nullable: false),
-                    UserId1 = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    TravelPackageId1 = table.Column<int>(type: "int", nullable: true)
+                    CheckInDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CheckOutDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalPrice = table.Column<long>(type: "bigint", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    ReservationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -190,21 +203,11 @@ namespace GoDecola.API.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Reservations_TravelPackages_TravelPackageId1",
-                        column: x => x.TravelPackageId1,
-                        principalTable: "TravelPackages",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Reservations_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Reservations_Users_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -302,8 +305,7 @@ namespace GoDecola.API.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ReservationId1 = table.Column<int>(type: "int", nullable: true)
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -314,12 +316,45 @@ namespace GoDecola.API.Migrations
                         principalTable: "Reservations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Guests_Reservations_ReservationId1",
-                        column: x => x.ReservationId1,
-                        principalTable: "Reservations",
-                        principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Payments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StripePaymentIntentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReservationId = table.Column<int>(type: "int", nullable: false),
+                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Method = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AmountPaid = table.Column<long>(type: "bigint", nullable: true),
+                    RedirectUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UrlVoucher = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Payments_Reservations_ReservationId",
+                        column: x => x.ReservationId,
+                        principalTable: "Reservations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AccommodationDetails_AddressId",
+                table: "AccommodationDetails",
+                column: "AddressId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AccommodationDetails_TravelPackageId",
+                table: "AccommodationDetails",
+                column: "TravelPackageId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -332,15 +367,9 @@ namespace GoDecola.API.Migrations
                 column: "ReservationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Guests_ReservationId1",
-                table: "Guests",
-                column: "ReservationId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_HotelAmenities_TravelPackageId",
-                table: "HotelAmenities",
-                column: "TravelPackageId",
-                unique: true);
+                name: "IX_Payments_ReservationId",
+                table: "Payments",
+                column: "ReservationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_TravelPackageId",
@@ -348,19 +377,9 @@ namespace GoDecola.API.Migrations
                 column: "TravelPackageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservations_TravelPackageId1",
-                table: "Reservations",
-                column: "TravelPackageId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Reservations_UserId",
                 table: "Reservations",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reservations_UserId1",
-                table: "Reservations",
-                column: "UserId1");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
@@ -370,13 +389,8 @@ namespace GoDecola.API.Migrations
                 filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TravelPackageImages_TravelPackageId",
-                table: "TravelPackageImages",
-                column: "TravelPackageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TravelPackageVideos_TravelPackageId",
-                table: "TravelPackageVideos",
+                name: "IX_TravelPackageMedias_TravelPackageId",
+                table: "TravelPackageMedias",
                 column: "TravelPackageId");
 
             migrationBuilder.CreateIndex(
@@ -411,19 +425,19 @@ namespace GoDecola.API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AccommodationDetails");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
                 name: "Guests");
 
             migrationBuilder.DropTable(
-                name: "HotelAmenities");
+                name: "Payments");
 
             migrationBuilder.DropTable(
-                name: "TravelPackageImages");
-
-            migrationBuilder.DropTable(
-                name: "TravelPackageVideos");
+                name: "TravelPackageMedias");
 
             migrationBuilder.DropTable(
                 name: "UserClaims");
@@ -436,6 +450,9 @@ namespace GoDecola.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserToken");
+
+            migrationBuilder.DropTable(
+                name: "Addresses");
 
             migrationBuilder.DropTable(
                 name: "Reservations");

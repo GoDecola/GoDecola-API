@@ -1,4 +1,6 @@
-﻿namespace GoDecola.API.Utils
+﻿using System.Text.RegularExpressions;
+
+namespace GoDecola.API.Utils
 {
     public static class ValidationUtils
     {
@@ -38,7 +40,24 @@
 
         public static bool IsValidRNE(string rne)
         {
-            return !string.IsNullOrWhiteSpace(rne) && rne.Length >= 9;
+            if (string.IsNullOrWhiteSpace(rne))
+                return false;
+
+            rne = rne.Trim();
+
+            // aceita letras e números mínimo 9 caracteres
+            return Regex.IsMatch(rne, @"^[A-Za-z0-9]{9,12}$");
+        }
+
+        public static bool IsValidPassport(string passport)
+        {
+            if (string.IsNullOrWhiteSpace(passport))
+                return false;
+
+            passport = passport.Trim().ToUpper();
+
+            // 2 letras + 6 números
+            return Regex.IsMatch(passport, @"^[A-Z]{2}\d{6}$");
         }
     }
 }
