@@ -2,7 +2,7 @@
 {
     public enum PackageType
     {
-        National,
-        International
+        NATIONAL,
+        INTERNATIONAL
     }
 }
