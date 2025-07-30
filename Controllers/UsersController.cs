@@ -80,7 +80,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpGet("{idOrDocument}")]
-        [Authorize(Roles = $"{nameof(UserType.ADMIN)}, {nameof(UserType.SUPPORT)}, {nameof(UserType.USER)}")]
+        [Authorize(Roles = "ADMIN, SUPPORT, USER")]
         public async Task<ActionResult<UserDTO>> GetByIdOrDocument(string idOrDocument)
         {
             User? usuario;
@@ -105,7 +105,7 @@ namespace GoDecola.API.Controllers
 
         // Atualiza os dados - exceto documento
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{nameof(UserType.ADMIN)}, {nameof(UserType.SUPPORT)}, {nameof(UserType.USER)}")]
+        [Authorize(Roles = "ADMIN, SUPPORT, USER")]
         public async Task<IActionResult> Update(string id, UpdateUserDTO dados)
         {
             var usuario = await _userManager.FindByIdAsync(id);
@@ -129,7 +129,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{nameof(UserType.ADMIN)},{nameof(UserType.SUPPORT)},{nameof(UserType.USER)}")]
+        [Authorize(Roles = "ADMIN, SUPPORT, USER")]
         public async Task<IActionResult> DeleteById(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -162,7 +162,7 @@ namespace GoDecola.API.Controllers
             return Ok("Usuário excluído com sucesso.");
         }
         [HttpGet("{userId}/reservations")]
-        [Authorize(Roles = $"{nameof(UserType.ADMIN)}, {nameof(UserType.SUPPORT)}, {nameof(UserType.USER)}")]
+        [Authorize(Roles = "ADMIN, SUPPORT, USER")]
         public async Task<IActionResult> GetUserReservations(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
