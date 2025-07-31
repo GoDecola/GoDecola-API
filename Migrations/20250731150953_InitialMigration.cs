@@ -60,7 +60,7 @@ namespace GoDecola.API.Migrations
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     NumberGuests = table.Column<int>(type: "int", nullable: false),
-                    PackageType = table.Column<int>(type: "int", nullable: false),
+                    PackageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DiscountPercentage = table.Column<double>(type: "float", nullable: true),
                     PromotionStartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PromotionEndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -165,7 +165,7 @@ namespace GoDecola.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TravelPackageId = table.Column<int>(type: "int", nullable: false),
                     MediaUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MediaType = table.Column<int>(type: "int", nullable: false),
+                    MediaType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UploadDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
