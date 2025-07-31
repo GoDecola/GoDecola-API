@@ -250,8 +250,9 @@ namespace GoDecola.API.Migrations
                     b.Property<int>("NumberGuests")
                         .HasColumnType("int");
 
-                    b.Property<int>("PackageType")
-                        .HasColumnType("int");
+                    b.Property<string>("PackageType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("Price")
                         .HasColumnType("bigint");
@@ -281,8 +282,9 @@ namespace GoDecola.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("MediaType")
-                        .HasColumnType("int");
+                    b.Property<string>("MediaType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MediaUrl")
                         .HasColumnType("nvarchar(max)");
