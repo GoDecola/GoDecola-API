@@ -22,7 +22,7 @@ namespace GoDecola.API.Controllers
             _paymentService = paymentService;
         }
 
-        [HttpPost("create-checkout-session")]
+        [HttpPost]
         public async Task<IActionResult> CreateCheckoutSession([FromBody] PaymentRequestDTO request)
         {
             if (!ModelState.IsValid)

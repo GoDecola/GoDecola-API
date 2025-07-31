@@ -37,7 +37,7 @@ namespace GoDecola.API.Controllers
             bool rneValido = !string.IsNullOrWhiteSpace(register.RNE) && ValidationUtils.IsValidRNE(register.RNE);
             bool passaportValido = !string.IsNullOrWhiteSpace(register.Passaport) && ValidationUtils.IsValidPassport(register.Passaport);
 
-            if (!cpfValido && !rneValido && !passaportValido)
+            if (!cpfValido && !rneValido)
                 return BadRequest("É obrigatório informar um CPF ou RNE válido.");
             if (!passaportValido)
                 return BadRequest("Informe um passaporte válido.");
