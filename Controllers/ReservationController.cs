@@ -5,8 +5,10 @@ using GoDecola.API.DTOs.UserDTOs;
 using GoDecola.API.Entities;
 using GoDecola.API.Enums;
 using GoDecola.API.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GoDecola.API.Controllers
 {
@@ -68,6 +70,16 @@ namespace GoDecola.API.Controllers
 
             var reservationResponse = _mapper.Map<ReservationDTO>(reservation);
             return Ok(reservationResponse);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, SUPPORT")]
+        public async Task<ActionResult<IEnumerable<ReservationDTO>>> GetAll()
+        {
+            var reservations = await _reservationRepository.GetAllAsync();
+            var reservationResponse = _mapper.Map<IEnumerable<ReservationDTO>>(reservations);
+            return Ok(reservationResponse);
+
         }
     }
 }
