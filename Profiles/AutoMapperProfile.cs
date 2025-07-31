@@ -45,9 +45,9 @@ namespace GoDecola.API.Profiles
             // ------------------------ RESERVATION -------------------------
 
             CreateMap<Reservation, ReservationDTO>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
-                .ForMember(dest => dest.TravelPackage.AccommodationDetails.Address, opt => opt.MapFrom(src => src.TravelPackage.AccommodationDetails.Address))
-                .ForMember(dest => dest.TravelPackage.MediasUrl, opt => opt.MapFrom(src => src.TravelPackage.Medias));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+                //.ForMember(dest => dest.TravelPackage.AccommodationDetails.Address, opt => opt.MapFrom(src => src.TravelPackage.AccommodationDetails.Address))
+                //.ForMember(dest => dest.TravelPackage.MediasUrl, opt => opt.MapFrom(src => src.TravelPackage.Medias));
 
             CreateMap<CreateReservationDTO, Reservation>();
             CreateMap<Guests, GuestsDTO>();

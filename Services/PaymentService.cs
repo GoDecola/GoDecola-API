@@ -40,7 +40,7 @@ namespace GoDecola.API.Services
                 ReservationId = request.ReservationId,
                 AmountPaid = reservation.TotalPrice,
                 Method = request.Method,
-                Status = PaymentStatus.PENDENTE.ToString(),
+                Status = PaymentStatus.PENDING.ToString(),
                 PaymentDate = DateTime.UtcNow
             };
 
@@ -85,7 +85,7 @@ namespace GoDecola.API.Services
             }
             catch (StripeException ex)
             {
-                payment.Status = PaymentStatus.FALHA.ToString();
+                payment.Status = PaymentStatus.FAILED.ToString();
                 await _paymentRepository.UpdateAsync(payment);
                 throw new Exception("Erro ao criar sessão de pagamento no Stripe: " + ex.Message);
             }
