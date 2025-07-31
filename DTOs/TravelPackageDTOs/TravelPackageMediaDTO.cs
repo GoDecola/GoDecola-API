@@ -6,8 +6,8 @@ namespace GoDecola.API.DTOs.TravelPackageDTOs
     {
         public int Id { get; set; }
         public int TravelPackageId { get; set; } // fk
-        public string? MediaUrl { get; set; }
-        public MediaType MediaType { get; set; }
+        public string? FilePath { get; set; }
+        public string? MimeType { get; set; }
         public DateTime UploadDate { get; set; } = DateTime.UtcNow;
     }
 }

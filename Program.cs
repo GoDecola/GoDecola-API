@@ -73,6 +73,7 @@ builder.Services.AddScoped<IRepository<TravelPackage, int>, TravelPackageReposit
 builder.Services.AddScoped<IRepository<Reservation, int>, ReservationRepository>();
 builder.Services.AddScoped<IRepository<Payment, int>, PaymentRepository>();
 builder.Services.AddScoped<ReservationRepository>();
+builder.Services.AddScoped<IMediaService, MediaService>();
 
 // Services
 builder.Services.AddScoped<IPaymentService>(provider =>
@@ -190,6 +191,8 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 
