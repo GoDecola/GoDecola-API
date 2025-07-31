@@ -38,6 +38,10 @@ namespace GoDecola.API.Repositories
             _context.Payments.Update(payment);
             await _context.SaveChangesAsync();
         }
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
 
         public async Task DeleteAsync(int id)
         {

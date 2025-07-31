@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoDecola.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250728180544_AddUserRole")]
-    partial class AddUserRole
+    [Migration("20250731170241_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -128,16 +128,32 @@ namespace GoDecola.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CPF")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Document")
+                    b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Passaport")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RNE")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ReservationId")
@@ -206,8 +222,8 @@ namespace GoDecola.API.Migrations
                     b.Property<DateTime>("ReservationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<long>("TotalPrice")
                         .HasColumnType("bigint");
@@ -216,7 +232,6 @@ namespace GoDecola.API.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -312,11 +327,11 @@ namespace GoDecola.API.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
+                    b.Property<string>("CPF")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Document")
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -327,9 +342,11 @@ namespace GoDecola.API.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -346,7 +363,14 @@ namespace GoDecola.API.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("Passaport")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
@@ -354,6 +378,9 @@ namespace GoDecola.API.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("RNE")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -559,8 +586,7 @@ namespace GoDecola.API.Migrations
                     b.HasOne("GoDecola.API.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("TravelPackage");
 

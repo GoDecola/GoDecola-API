@@ -35,7 +35,7 @@ namespace GoDecola.API.Controllers
         public async Task<IActionResult> CreateReservation(CreateReservationDTO createReservation)
         {
             // verificar se user existe
-            var user = await _userRepository.GetByIdAsync(createReservation.UserId);
+            var user = await _userRepository.GetByIdAsync(createReservation.UserId ?? string.Empty);
             if (user == null)
                 return NotFound("Usuário não encontrado.");
 

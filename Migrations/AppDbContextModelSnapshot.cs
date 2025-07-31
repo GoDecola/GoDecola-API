@@ -125,16 +125,32 @@ namespace GoDecola.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CPF")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Document")
+                    b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Passaport")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RNE")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ReservationId")
@@ -323,9 +339,11 @@ namespace GoDecola.API.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -348,6 +366,10 @@ namespace GoDecola.API.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -362,9 +384,6 @@ namespace GoDecola.API.Migrations
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)

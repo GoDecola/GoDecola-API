@@ -1,3 +1,4 @@
+using GoDecola.API.Controllers;
 using GoDecola.API.Data;
 using GoDecola.API.Entities;
 using GoDecola.API.Profiles;
@@ -8,16 +9,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Stripe;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Text;
-using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var secretKey = builder.Configuration["Jwt:SecretKey"];
 
-var key = Encoding.ASCII.GetBytes(secretKey);
+var key = Encoding.ASCII.GetBytes(secretKey!);
 
 builder.Services.AddScoped<JwtService>(
     serviceProvider =>
@@ -25,7 +26,7 @@ builder.Services.AddScoped<JwtService>(
         // injeta o UserManager<User> no JwtService
         var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
 
-        return new JwtService(secretKey, userManager);
+        return new JwtService(secretKey!, userManager);
     }
 );
 
@@ -73,26 +74,32 @@ builder.Services.AddScoped<IRepository<Reservation, int>, ReservationRepository>
 builder.Services.AddScoped<IRepository<Payment, int>, PaymentRepository>();
 builder.Services.AddScoped<ReservationRepository>();
 
-// Services
 builder.Services.AddScoped<IPaymentService>(provider =>
 {
     var reservationRepo = provider.GetRequiredService<IRepository<Reservation, int>>();
     var paymentRepo = provider.GetRequiredService<IRepository<Payment, int>>();
+    var logger = provider.GetRequiredService<ILogger<WebhookController>>(); // Logger para registrar eventos do Stripe, remover dps
 
-    var stripeOptions = builder.Configuration.GetSection("Stripe").Get<StripeSettings>();
+    var stripeConfig = builder.Configuration.GetSection("Stripe");
+    var stripeSettings = new StripeSettings
+    {
+        PublishableKey = stripeConfig["PublishableKey"] ?? throw new Exception("PublishableKey não configurado"),
+        SecretKey = stripeConfig["SecretKey"] ?? throw new Exception("SecretKey não configurado")
+    };
 
-    // URLs para redirecionamento após o pagamento com Stripe:
-    // - SuccessUrl: para onde o usuário será enviado após pagamento sucedido
-    // - CancelUrl: para onde o usuário será enviado caso cancele o pagamento
-    var successUrl = builder.Configuration["Stripe:SuccessUrl"];
-    var cancelUrl = builder.Configuration["Stripe:CancelUrl"];
+    string successUrl = stripeConfig["SuccessUrl"] ?? throw new Exception("SuccessUrl não configurado");
+    string cancelUrl = stripeConfig["CancelUrl"] ?? throw new Exception("CancelUrl não configurado");
 
-    return new PaymentService(reservationRepo, paymentRepo, stripeOptions, successUrl, cancelUrl);
+    // Aqui: retorna a instância do PaymentService, não registra outro serviço dentro
+    return new PaymentService(
+        reservationRepo,
+        paymentRepo,
+        stripeSettings,
+        logger, //remover dps
+        successUrl,
+        cancelUrl
+    );
 });
-
-// Configura Stripe
-builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
-StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe")["SecretKey"]; // Configura a chave secreta da Stripe
 
 // CORS
 builder.Services.AddCors(

@@ -7,5 +7,6 @@
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
         Task DeleteAsync(TId id);
+        Task SaveChangesAsync();
     }
 }

@@ -42,6 +42,10 @@ namespace GoDecola.API.Repositories
             _context.TravelPackages.Update(travelPackage);
             await _context.SaveChangesAsync();
         }
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
 
         public async Task DeleteAsync(int id)
         {

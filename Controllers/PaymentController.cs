@@ -3,6 +3,7 @@ using GoDecola.API.DTOs.PaymentDTOs;
 using GoDecola.API.DTOs.UserDTOs;
 using GoDecola.API.Entities;
 using GoDecola.API.Enums;
+using GoDecola.API.Repositories;
 using GoDecola.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +23,7 @@ namespace GoDecola.API.Controllers
             _paymentService = paymentService;
         }
 
-        [HttpPost("create-checkout-session")]
+        [HttpPost("checkout")]
         public async Task<IActionResult> CreateCheckoutSession([FromBody] PaymentRequestDTO request)
         {
             if (!ModelState.IsValid)
@@ -35,9 +36,27 @@ namespace GoDecola.API.Controllers
             }
             catch (Exception ex)
             {
-                // log de erro
                 return StatusCode(500, new { error = ex.Message });
             }
+        }
+
+        [Authorize(Roles = "ADMIN,SUPPORT")]
+        [HttpGet("admin/list")]
+        public async Task<IActionResult> GetAllPayments()
+        {
+            var response = await _paymentService.GetAllPaymentsAsync();
+            return Ok(response);
+        }
+
+        [Authorize(Roles = "ADMIN,SUPPORT")]
+        [HttpGet("admin/{id}")]
+        public async Task<IActionResult> GetPaymentById(int id)
+        {
+            var response = await _paymentService.GetPaymentByIdAsync(id);
+            if (response == null)
+                return NotFound(new { message = "Pagamento não encontrado." });
+
+            return Ok(response);
         }
     }
 }

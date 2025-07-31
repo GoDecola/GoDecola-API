@@ -28,8 +28,8 @@ namespace GoDecola.API.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
             };
 
             foreach (var role in roles)
