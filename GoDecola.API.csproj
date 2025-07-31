@@ -43,7 +43,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\Medias\Images\TravelPackage\" />
+    <Folder Include="wwwroot\Medias\Videos\TravelPackage\" />
     <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>

@@ -133,7 +133,7 @@ namespace GoDecola.API.Data
                         },
                         Medias = new List<TravelPackageMedia>
                         {
-                            new TravelPackageMedia { MediaUrl = "https://hansenimoveis.com/wp-content/uploads/2022/02/CO653-3.jpg", UploadDate = DateTime.UtcNow, MediaType = MediaType.IMAGE },
+                            new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/ubatuba.jpg", UploadDate = DateTime.UtcNow, MimeType = "image/jpeg" },
                         } 
                     },
                     new TravelPackage 
@@ -167,7 +167,7 @@ namespace GoDecola.API.Data
                         },
                         Medias = new List<TravelPackageMedia>
                         {
-                            new TravelPackageMedia { MediaUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSacQlg6kYF4qTkWf80HRLnhvHSt6bvIWho8A&s", UploadDate = DateTime.UtcNow, MediaType = MediaType.IMAGE },
+                            new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/socorro.jpeg", UploadDate = DateTime.UtcNow, MimeType = "image/jpeg" },
                         }
                     },
                     new TravelPackage
@@ -197,7 +197,7 @@ namespace GoDecola.API.Data
                         },
                         Medias = new List<TravelPackageMedia>
                         {
-                            new TravelPackageMedia { MediaUrl = "https://thumbs.dreamstime.com/b/vida-noturna-em-dotonbori-osaka-kansai-japan-267022014.jpg", UploadDate = DateTime.UtcNow, MediaType = MediaType.IMAGE },
+                            new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/tokyo.webp", UploadDate = DateTime.UtcNow, MimeType = "image/webp" },
                         }
                     }
                 });

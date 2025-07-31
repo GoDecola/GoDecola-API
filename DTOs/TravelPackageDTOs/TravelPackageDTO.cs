@@ -17,7 +17,7 @@ namespace GoDecola.API.DTOs.TravelPackageDTOs
         public AccommodationDTO AccommodationDetails { get; set; } = new AccommodationDTO();
         public ICollection<TravelPackageMediaDTO> MediasUrl { get; set; } = new List<TravelPackageMediaDTO>();
         public PackageType PackageType { get; set; }
-        public bool IsCurrentylOnPromotion { get; set; }
+        public bool IsCurrentlyOnPromotion { get; set; }
         public double? DiscountPercentage { get; set; }
         public DateTime? PromotionStartDate { get; set; }
         public DateTime? PromotionEndDate { get; set; }

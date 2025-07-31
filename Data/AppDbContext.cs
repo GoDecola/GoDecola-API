@@ -36,10 +36,6 @@ namespace GoDecola.API.Data
                 .Property(p => p.PackageType) // configura o package type como string
                 .HasConversion<string>();
 
-            builder.Entity<TravelPackageMedia>()
-                 .Property(m => m.MediaType) // configura o media type como string
-                 .HasConversion<string>();
-
             builder.Entity<TravelPackage>()
                 .HasMany(tp => tp.Medias) // um pacote de viagem pode ter várias mídias
                 .WithOne(tpm => tpm.TravelPackage) // Propriedade de navegação inversa
