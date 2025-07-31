@@ -12,7 +12,6 @@ namespace GoDecola.API.DTOs.TravelPackageDTOs
         public DateTime EndDate { get; set; }
         public int NumberGuests { get; set; }
         public AccommodationDTO AccommodationDetails { get; set; } = new AccommodationDTO();
-        public ICollection<TravelPackageMediaDTO> MediasUrl { get; set; } = new List<TravelPackageMediaDTO>();
         public bool IsActive { get; set; }
         public double? DiscountPercentage { get; set; }
         public DateTime? PromotionStartDate { get; set; }

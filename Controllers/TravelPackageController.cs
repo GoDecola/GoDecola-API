@@ -3,6 +3,7 @@ using GoDecola.API.DTOs.TravelPackageDTOs;
 using GoDecola.API.Entities;
 using GoDecola.API.Enums;
 using GoDecola.API.Repositories;
+using GoDecola.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -14,13 +15,54 @@ namespace GoDecola.API.Controllers
     [ApiController]
     public class TravelPackageController : ControllerBase
     {
+        private readonly IMediaService _mediaService;
         private readonly IRepository<TravelPackage, int> _travelPackageRepository;
         private readonly IMapper _mapper;
 
-        public TravelPackageController(IRepository<TravelPackage, int> travelPackageRepository, IMapper mapper)
+        public TravelPackageController(IRepository<TravelPackage, int> travelPackageRepository, IMapper mapper, IMediaService mediaService)
         {
             _travelPackageRepository = travelPackageRepository;
             _mapper = mapper;
+            _mediaService = mediaService;
+        }
+
+        [HttpPost("{id}/media")]
+        [Authorize (Roles = nameof(UserType.ADMIN))]
+        public async Task<IActionResult> UploadMedia(int id, [FromForm] List<IFormFile> files)
+        {
+            var travelPackage = await _travelPackageRepository.GetByIdAsync(id);
+            if (travelPackage == null)
+            {
+                return NotFound("Pacote de viagem não encontrado.");
+            }
+
+            if (files == null || files.Count == 0)
+            {
+                return BadRequest("Nenhum arquivo enviado.");
+            }
+
+            var uploadedMediasEntities = new List<TravelPackageMedia>();
+
+            foreach (var file in files) 
+            {
+                try 
+                {
+                    var newMedia = await _mediaService.UploadMediaForTravelPackageAsync(file, id);
+                    uploadedMediasEntities.Add(newMedia);
+                }
+                catch (ArgumentException ex)
+                {
+                    return BadRequest($"Erro ao fazer upload do arquivo {file.FileName}: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao fazer upload do arquivo {file.FileName}: {ex.Message}");
+                }
+            }
+
+            var uploadedMediasDto = _mapper.Map<List<TravelPackageMediaDTO>>(uploadedMediasEntities); // mapeia as entidades para DTOs
+
+            return CreatedAtAction(nameof(UploadMedia), new { id = id }, uploadedMediasDto); 
         }
 
         [HttpGet]
@@ -42,7 +84,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = nameof(UserType.ADMIN))]
         public async Task<IActionResult> Create(CreateTravelPackageDTO travelPackage)
         {
             var newTravelPackage = _mapper.Map<TravelPackage>(travelPackage);
@@ -59,7 +101,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = nameof(UserType.ADMIN))]
         public async Task<IActionResult> Update(int id, UpdateTravelPackageDTO travelPackage)
         {
             var existingTravelPackage = await _travelPackageRepository.GetByIdAsync(id);
@@ -77,7 +119,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = nameof(UserType.ADMIN))]
         public async Task<IActionResult> Delete(int id)
         {
             var travelPackage = await _travelPackageRepository.GetByIdAsync(id);

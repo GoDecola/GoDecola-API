@@ -13,6 +13,7 @@ using Stripe;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +36,7 @@ builder.Services.AddDbContext<AppDbContext>(
         options => options.UseSqlServer(
             builder.Configuration.GetConnectionString("DefaultConnection")
         )
-           .EnableSensitiveDataLogging() // mostra parâmetros reais - dps remover apenas para testes
+           .EnableSensitiveDataLogging() // mostra parÃ¢metros reais - dps remover apenas para testes
            .EnableDetailedErrors()       // mostra detalhes do erro - dps remover apenas para testes
            .LogTo(Console.WriteLine, LogLevel.Information) // joga no console - dps remover apenas para testes
     );
@@ -55,14 +56,14 @@ builder.Services.AddAuthentication(options =>
 .AddJwtBearer(
     options =>
     {
-        options.RequireHttpsMetadata = false; // alterar para true em produção
+        options.RequireHttpsMetadata = false; // alterar para true em produÃ§Ã£o
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false, // alterar para true em produção
-            ValidateAudience = false, // alterar para true em produção
+            ValidateIssuer = false, // alterar para true em produÃ§Ã£o
+            ValidateAudience = false, // alterar para true em produÃ§Ã£o
         };
     }
 );
@@ -76,6 +77,7 @@ builder.Services.AddScoped<IRepository<TravelPackage, int>, TravelPackageReposit
 builder.Services.AddScoped<IRepository<Reservation, int>, ReservationRepository>();
 builder.Services.AddScoped<IRepository<Payment, int>, PaymentRepository>();
 builder.Services.AddScoped<ReservationRepository>();
+builder.Services.AddScoped<IMediaService, MediaService>();
 
 builder.Services.AddScoped<IPaymentService>(provider =>
 {
@@ -86,14 +88,14 @@ builder.Services.AddScoped<IPaymentService>(provider =>
     var stripeConfig = builder.Configuration.GetSection("Stripe");
     var stripeSettings = new StripeSettings
     {
-        PublishableKey = stripeConfig["PublishableKey"] ?? throw new Exception("PublishableKey não configurado"),
-        SecretKey = stripeConfig["SecretKey"] ?? throw new Exception("SecretKey não configurado")
+        PublishableKey = stripeConfig["PublishableKey"] ?? throw new Exception("PublishableKey nÃ£o configurado"),
+        SecretKey = stripeConfig["SecretKey"] ?? throw new Exception("SecretKey nÃ£o configurado")
     };
 
-    string successUrl = stripeConfig["SuccessUrl"] ?? throw new Exception("SuccessUrl não configurado");
-    string cancelUrl = stripeConfig["CancelUrl"] ?? throw new Exception("CancelUrl não configurado");
+    string successUrl = stripeConfig["SuccessUrl"] ?? throw new Exception("SuccessUrl nÃ£o configurado");
+    string cancelUrl = stripeConfig["CancelUrl"] ?? throw new Exception("CancelUrl nÃ£o configurado");
 
-    // Aqui: retorna a instância do PaymentService, não registra outro serviço dentro
+    // Aqui: retorna a instÃ¢ncia do PaymentService, nÃ£o registra outro serviÃ§o dentro
     return new PaymentService(
         reservationRepo,
         paymentRepo,
@@ -117,7 +119,11 @@ builder.Services.AddCors(
 );
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); // converte enums para strings no JSON
+    });
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddSwaggerGen(
@@ -196,6 +202,8 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

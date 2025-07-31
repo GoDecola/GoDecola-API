@@ -3,6 +3,16 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Ignora todo o conteúdo dentro das pastas de upload...
+wwwroot/Medias/Images/TravelPackage/*
+wwwroot/Medias/Videos/*
+
+# MAS, ENTRETANTO, não ignora os arquivos específicos usados para o SeedData.
+# O "!" nega a regra anterior para um arquivo especifico.
+!wwwroot/Medias/Images/TravelPackage/ubatuba.jpg
+!wwwroot/Medias/Images/TravelPackage/socorro.jpeg
+!wwwroot/Medias/Images/TravelPackage/tokyo.webp
+
 # User-specific files
 *.rsuser
 *.suo

@@ -22,10 +22,9 @@ namespace GoDecola.API.Profiles
             // ------------------------ TRAVEL PACKAGE -------------------------
 
             CreateMap<TravelPackage, TravelPackageDTO>()
-                .ForMember(dest => dest.IsCurrentylOnPromotion, opt => opt.MapFrom(src => src.IsCurrentlyOnPromotion)) // mapeia a propriedade IsCurrentlyOnPromotion do TravelPackage para IsCurrentylOnPromotion do TravelPackageDTO
+                .ForMember(dest => dest.IsCurrentlyOnPromotion, opt => opt.MapFrom(src => src.IsCurrentlyOnPromotion)) // mapeia a propriedade IsCurrentlyOnPromotion do TravelPackage para IsCurrentylOnPromotion do TravelPackageDTO
                 .ForMember(dest => dest.MediasUrl, opt => opt.MapFrom(src => src.Medias)); // mapeia a collection de TravelPackageMedia para TravelPackageMediaDTO
-            CreateMap<CreateTravelPackageDTO, TravelPackage>()
-                .ForMember(dest => dest.Medias, opt => opt.MapFrom(src => src.MediasUrl));
+            CreateMap<CreateTravelPackageDTO, TravelPackage>();
             CreateMap<UpdateTravelPackageDTO, TravelPackage>(); 
 
             CreateMap<AccommodationDetails, AccommodationDTO>();
