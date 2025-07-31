@@ -35,11 +35,15 @@ namespace GoDecola.API.Controllers
         {
             bool cpfValido = !string.IsNullOrWhiteSpace(register.CPF) && ValidationUtils.IsValidCPF(register.CPF);
             bool rneValido = !string.IsNullOrWhiteSpace(register.RNE) && ValidationUtils.IsValidRNE(register.RNE);
-            bool passaportValido = !string.IsNullOrWhiteSpace(register.Passaport) && ValidationUtils.IsValidPassport(register.Passaport);
 
-            if (!cpfValido && !rneValido && !passaportValido)
+            // passaporte é validado caso o campo esteja preenchido
+            bool passaportInformado = !string.IsNullOrWhiteSpace(register.Passaport);
+            bool passaportValido = !passaportInformado || ValidationUtils.IsValidPassport(register.Passaport);
+
+            if (!cpfValido && !rneValido)
                 return BadRequest("É obrigatório informar um CPF ou RNE válido.");
-            if (!passaportValido)
+            // se passaporte for informado e não for válido, retorna erro
+            if (passaportInformado && !passaportValido)
                 return BadRequest("Informe um passaporte válido.");
 
             // Verifica duplicidade de cpf
@@ -51,7 +55,8 @@ namespace GoDecola.API.Controllers
                 return BadRequest("Já existe um usuário com este RNE.");
 
             // Verifica duplicidade de passaporteee
-            if (passaportValido && await _userManager.Users.AnyAsync(u => u.Passaport == register.Passaport))
+            // se passaporte informado ele verifica se já existe um usuário com o mesmo passaporte, se nao for informado, não verifica
+            if (passaportInformado && await _userManager.Users.AnyAsync(u => u.Passaport == register.Passaport))
                 return BadRequest("Já existe um usuário com este passaporte.");
 
             var user = new User
