@@ -27,17 +27,6 @@ namespace GoDecola.API.Controllers
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
 
-
-            ///apagar dps, apenas para testes
-            if (string.IsNullOrEmpty(json))
-            {
-                _logger.LogWarning("Webhook recebido com body vazio");
-                return BadRequest(new { error = "Body vazio" });
-            }
-
-            //////////////////////////////////////////////
-
-
             try
             {
                 var webhookSecret = _configuration["Stripe:WebhookSecret"];

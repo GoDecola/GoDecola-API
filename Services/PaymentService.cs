@@ -3,6 +3,7 @@ using GoDecola.API.DTOs.PaymentDTOs;
 using GoDecola.API.Entities;
 using GoDecola.API.Enums;
 using GoDecola.API.Repositories;
+using Newtonsoft.Json;
 using Stripe;
 using Stripe.Checkout;
 
@@ -13,14 +14,15 @@ namespace GoDecola.API.Services
         private readonly IRepository<Reservation, int> _reservationRepository;
         private readonly IRepository<Payment, int> _paymentRepository;
         private readonly StripeSettings _stripeSettings;
-        private readonly ILogger<WebhookController> _logger; //apagar dps, apenas para testes
+        private readonly ILogger<WebhookController> _logger;
         private readonly string _successUrl;
         private readonly string _cancelUrl;
 
         public PaymentService(
             IRepository<Reservation, int> reservationRepository,
             IRepository<Payment, int> paymentRepository,
-            StripeSettings stripeSettings, ILogger<WebhookController> logger, //apagar dps, apenas para testes,
+            StripeSettings stripeSettings,
+            ILogger<WebhookController> logger,
             string successUrl,
             string cancelUrl)
         {
@@ -29,12 +31,11 @@ namespace GoDecola.API.Services
             _stripeSettings = stripeSettings;
             _successUrl = successUrl;
             _cancelUrl = cancelUrl;
-            _logger = logger; //apagar dps, apenas para testes
+            _logger = logger;
 
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
         }
 
-        // Criação de checkout com Metadata + Email
         public async Task<PaymentResponseDTO> InitiateStripeCheckout(PaymentRequestDTO request)
         {
             var reservation = await _reservationRepository.GetByIdAsync(request.ReservationId);
@@ -51,42 +52,39 @@ namespace GoDecola.API.Services
             };
 
             await _paymentRepository.AddAsync(payment);
-            await _paymentRepository.SaveChangesAsync();
-
 
             var guestEmail = reservation.Guests?.FirstOrDefault()?.Email;
-
-            Console.WriteLine($"Email do hóspede para Stripe: {(string.IsNullOrEmpty(guestEmail) ? "null ou vazio" : guestEmail)}");
+            _logger.LogInformation($"Email do hóspede enviado para Stripe: {guestEmail}");
 
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
                 Mode = "payment",
-                CustomerEmail = guestEmail, // envia o e-mail do primeiro hóspede
+                CustomerEmail = guestEmail,
                 Metadata = new Dictionary<string, string>
-            {
-                { "payment_id", payment.Id.ToString() },
-                { "reservation_id", request.ReservationId.ToString() }
-            },
+                {
+                    { "payment_id", payment.Id.ToString() },
+                    { "reservation_id", request.ReservationId.ToString() }
+                },
                 LineItems = new List<SessionLineItemOptions>
-                    {
-                        new SessionLineItemOptions
+                {
+                    new SessionLineItemOptions
                     {
                         PriceData = new SessionLineItemPriceDataOptions
                         {
                             Currency = "brl",
                             UnitAmount = reservation.TotalPrice,
                             ProductData = new SessionLineItemPriceDataProductDataOptions
-                        {
-                            Name = $"Reserva #{reservation.Id}",
-                            Description = $"Reserva ID: {request.ReservationId}"
-                        }
-                    },
+                            {
+                                Name = $"Reserva #{reservation.Id}",
+                                Description = $"Reserva ID: {request.ReservationId}"
+                            }
+                        },
                         Quantity = 1
                     }
-                 },
-                SuccessUrl = _successUrl + $"?session_id={{CHECKOUT_SESSION_ID}}&payment_id={payment.Id}",
-                CancelUrl = _cancelUrl + $"?payment_id={payment.Id}"
+                },
+                SuccessUrl = $"{_successUrl}?session_id={{CHECKOUT_SESSION_ID}}&payment_id={payment.Id}",
+                CancelUrl = $"{_cancelUrl}?payment_id={payment.Id}"
             };
 
             var service = new SessionService();
@@ -97,8 +95,6 @@ namespace GoDecola.API.Services
                 payment.StripePaymentIntentId = session.PaymentIntentId;
 
                 await _paymentRepository.UpdateAsync(payment);
-                await _paymentRepository.SaveChangesAsync();
-
                 return new PaymentResponseDTO
                 {
                     RedirectUrl = session.Url,
@@ -111,7 +107,6 @@ namespace GoDecola.API.Services
             {
                 payment.Status = PaymentStatus.FAILED.ToString();
                 await _paymentRepository.UpdateAsync(payment);
-                await _paymentRepository.SaveChangesAsync();
                 throw new Exception("Erro ao criar sessão de pagamento no Stripe: " + ex.Message);
             }
         }
@@ -150,16 +145,14 @@ namespace GoDecola.API.Services
             };
         }
 
-        //Tratamento de eventos
         public async Task HandleStripeWebhookAsync(Event stripeEvent)
         {
+            _logger.LogInformation($"[Stripe Webhook] Evento recebido: {stripeEvent.Type}");
+
             switch (stripeEvent.Type)
             {
                 case "checkout.session.completed":
                     await HandleCheckoutSessionCompleted(stripeEvent);
-                    break;
-                case "charge.updated":
-                    await HandleChargeUpdated(stripeEvent);
                     break;
                 case "payment_intent.succeeded":
                     await HandlePaymentIntentSucceeded(stripeEvent);
@@ -173,218 +166,166 @@ namespace GoDecola.API.Services
             }
         }
 
-       
-        /// apenas para testes, não deve ser usado em produção
-        
         private async Task HandleCheckoutSessionCompleted(Event stripeEvent)
         {
-            if (stripeEvent.Data.Object == null)
-            {
-                _logger.LogWarning("Evento checkout.session.completed sem Data.Object");
-                return;
-            }
-
             var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
-            var emailDoCliente = session!.CustomerEmail;
-            _logger.LogInformation($"Email recebido do evento: {emailDoCliente}");
-            if (session?.Metadata == null)
+            if (session == null)
             {
-                _logger.LogWarning("Checkout session sem metadata");
+                _logger.LogWarning("Checkout session nula.");
                 return;
             }
 
-            if (!session.Metadata.TryGetValue("payment_id", out var paymentIdStr) ||
-                !int.TryParse(paymentIdStr, out int paymentId))
+
+            _logger.LogInformation($"Metadata recebido: {JsonConvert.SerializeObject(session.Metadata)}");
+
+            Payment? payment = null;
+
+            if (session.Metadata.TryGetValue("payment_id", out var paymentIdStr) &&
+                int.TryParse(paymentIdStr, out int paymentId))
             {
-                _logger.LogWarning("payment_id inválido ou ausente no metadata");
-                return;
+                payment = await _paymentRepository.GetByIdAsync(paymentId);
             }
 
-            if (!session.Metadata.TryGetValue("reservation_id", out var reservationIdStr) ||
-                !int.TryParse(reservationIdStr, out int reservationId))
+            if (payment == null &&
+                session.Metadata.TryGetValue("reservation_id", out var reservationIdStr) &&
+                int.TryParse(reservationIdStr, out int reservationId))
             {
-                _logger.LogWarning("reservation_id inválido ou ausente no metadata");
-                return;
+                var allPayments = await _paymentRepository.GetAllAsync();
+                payment = allPayments.FirstOrDefault(p => p.ReservationId == reservationId);
             }
-
-            var payment = await _paymentRepository.GetByIdAsync(paymentId);
-            var reservation = await _reservationRepository.GetByIdAsync(reservationId);
 
             if (payment == null)
             {
-                _logger.LogWarning($"Pagamento não encontrado: payment_id {paymentId}");
+                _logger.LogWarning("Nenhum pagamento encontrado para atualizar.");
+                return;
             }
-            else
+            
+            payment.Status = PaymentStatus.CONFIRMED.ToString();
+
+            var chargeService = new ChargeService();
+            var charges = await chargeService.ListAsync(new ChargeListOptions
             {
-                payment.Status = PaymentStatus.CONFIRMED.ToString();
+                PaymentIntent = session.PaymentIntentId,
+                Limit = 1
+            });
 
-                var chargeService = new ChargeService();
-                var charges = await chargeService.ListAsync(new ChargeListOptions
-                {
-                    PaymentIntent = session.PaymentIntentId,
-                    Limit = 1
-                });
-
-                var charge = charges.Data.FirstOrDefault();
-                if (charge != null)
-                {
-                    payment.UrlVoucher = charge.ReceiptUrl;
-                }
-            }
-
-            if (reservation != null)
+            var charge = charges.Data.FirstOrDefault();
+            if (charge != null)
             {
-                _logger.LogWarning($"Reserva não encontrada: reservation_id {reservationId}");
-            }
-            else if (reservation!.Status == ReservationStatus.PENDING)
-            {
-                reservation.Status = ReservationStatus.CONFIRMED;
+                payment.UrlVoucher = charge.ReceiptUrl;
             }
 
-            // Salvar tudo junto
-            await _paymentRepository.UpdateAsync(payment!);
-            await _reservationRepository.UpdateAsync(reservation!);
-            await _paymentRepository.SaveChangesAsync();
-            await _reservationRepository.SaveChangesAsync();
+            await _paymentRepository.UpdateAsync(payment);
 
-            _logger.LogInformation($"checkout.session.completed processado para payment_id {paymentId} e reservation_id {reservationId}");
-        }
-        // Apenas para testes, não deve ser usado em produção
-
-        /* private async Task HandleCheckoutSessionCompleted(Event stripeEvent)
-        {
-            var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
-            if (session?.Metadata == null) return;
-
-            if (!session.Metadata.TryGetValue("payment_id", out var paymentIdStr) ||
-                !int.TryParse(paymentIdStr, out int paymentId)) return;
-
-            if (!session.Metadata.TryGetValue("reservation_id", out var reservationIdStr) ||
-                !int.TryParse(reservationIdStr, out int reservationId)) return;
-
-            var payment = await _paymentRepository.GetByIdAsync(paymentId);
-            if (payment != null)
-            {
-                payment.Status = PaymentStatus.CONFIRMED.ToString();
-
-                var chargeService = new ChargeService();
-                var charges = await chargeService.ListAsync(new ChargeListOptions
-                {
-                    PaymentIntent = session.PaymentIntentId,
-                    Limit = 1
-                });
-
-                var charge = charges.Data.FirstOrDefault();
-                if (charge != null)
-                {
-                    payment.UrlVoucher = charge.ReceiptUrl;
-                }
-
-                await _paymentRepository.UpdateAsync(payment);
-                await _paymentRepository.SaveChangesAsync();
-            }
-
-            var reservation = await _reservationRepository.GetByIdAsync(reservationId);
+            var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
             if (reservation != null && reservation.Status == ReservationStatus.PENDING)
             {
                 reservation.Status = ReservationStatus.CONFIRMED;
                 await _reservationRepository.UpdateAsync(reservation);
-                await _reservationRepository.SaveChangesAsync();
             }
-        } */
 
-        private async Task HandleChargeUpdated(Event stripeEvent)
-        {
-            var charge = stripeEvent.Data.Object as Charge;
-            if (charge?.Metadata == null) return;
-
-            if (!charge.Metadata.TryGetValue("payment_id", out var paymentIdStr) ||
-                !int.TryParse(paymentIdStr, out int paymentId)) return;
-
-            var payment = await _paymentRepository.GetByIdAsync(paymentId);
-            if (payment != null)
-            {
-                payment.Status = charge.Paid ? PaymentStatus.CONFIRMED.ToString() : PaymentStatus.PENDING.ToString();
-                payment.UrlVoucher = charge.ReceiptUrl;
-
-                await _paymentRepository.UpdateAsync(payment);
-                await _paymentRepository.SaveChangesAsync();
-            }
         }
 
         private async Task HandlePaymentIntentSucceeded(Event stripeEvent)
         {
             var intent = stripeEvent.Data.Object as PaymentIntent;
-            if (intent?.Metadata == null) return;
+            if (intent == null) return;
 
-            if (!intent.Metadata.TryGetValue("payment_id", out var paymentIdStr) ||
-                !int.TryParse(paymentIdStr, out int paymentId)) return;
+            Payment? payment = null;
 
-            var payment = await _paymentRepository.GetByIdAsync(paymentId);
-            if (payment != null)
+            if (intent.Metadata.TryGetValue("payment_id", out var paymentIdStr) &&
+                int.TryParse(paymentIdStr, out int paymentId))
             {
-                payment.Status = PaymentStatus.CONFIRMED.ToString();
-                await _paymentRepository.UpdateAsync(payment);
-                await _paymentRepository.SaveChangesAsync();
+                payment = await _paymentRepository.GetByIdAsync(paymentId);
+            }
 
-                var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
-                if (reservation != null && reservation.Status == ReservationStatus.PENDING)
-                {
-                    reservation.Status = ReservationStatus.CONFIRMED;
-                    await _reservationRepository.UpdateAsync(reservation);
-                    await _reservationRepository.SaveChangesAsync();
-                }
+            if (payment == null && !string.IsNullOrEmpty(intent.Id))
+            {
+                var allPayments = await _paymentRepository.GetAllAsync();
+                payment = allPayments.FirstOrDefault(p => p.StripePaymentIntentId == intent.Id);
+            }
+
+            if (payment == null) return;
+
+            payment.Status = PaymentStatus.CONFIRMED.ToString();
+            await _paymentRepository.UpdateAsync(payment);
+           
+
+            var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
+            if (reservation != null && reservation.Status == ReservationStatus.PENDING)
+            {
+                reservation.Status = ReservationStatus.CONFIRMED;
+                await _reservationRepository.UpdateAsync(reservation);
+                
             }
         }
 
         private async Task HandlePaymentIntentFailed(Event stripeEvent)
         {
             var intent = stripeEvent.Data.Object as PaymentIntent;
-            if (intent?.Metadata == null) return;
+            if (intent == null) return;
 
-            if (!intent.Metadata.TryGetValue("payment_id", out var paymentIdStr) ||
-                !int.TryParse(paymentIdStr, out int paymentId)) return;
+            Payment? payment = null;
 
-            var payment = await _paymentRepository.GetByIdAsync(paymentId);
-            if (payment != null)
+            if (intent.Metadata.TryGetValue("payment_id", out var paymentIdStr) &&
+                int.TryParse(paymentIdStr, out int paymentId))
             {
-                payment.Status = PaymentStatus.FAILED.ToString();
-                await _paymentRepository.UpdateAsync(payment);
-                await _paymentRepository.SaveChangesAsync();
+                payment = await _paymentRepository.GetByIdAsync(paymentId);
+            }
 
-                var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
-                if (reservation != null)
-                {
-                    reservation.Status = ReservationStatus.CANCELLED;
-                    await _reservationRepository.UpdateAsync(reservation);
-                    await _reservationRepository.SaveChangesAsync();
-                }
+            if (payment == null && !string.IsNullOrEmpty(intent.Id))
+            {
+                var allPayments = await _paymentRepository.GetAllAsync();
+                payment = allPayments.FirstOrDefault(p => p.StripePaymentIntentId == intent.Id);
+            }
+
+            if (payment == null) return;
+
+            payment.Status = PaymentStatus.FAILED.ToString();
+            await _paymentRepository.UpdateAsync(payment);
+            
+
+            var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
+            if (reservation != null)
+            {
+                reservation.Status = ReservationStatus.CANCELLED;
+                await _reservationRepository.UpdateAsync(reservation);
+                
             }
         }
 
         private async Task HandleChargeRefunded(Event stripeEvent)
         {
             var charge = stripeEvent.Data.Object as Charge;
-            if (charge?.Metadata == null) return;
+            if (charge == null) return;
 
-            if (!charge.Metadata.TryGetValue("payment_id", out var paymentIdStr) ||
-                !int.TryParse(paymentIdStr, out int paymentId)) return;
+            Payment? payment = null;
 
-            var payment = await _paymentRepository.GetByIdAsync(paymentId);
-            if (payment != null)
+            if (charge.Metadata.TryGetValue("payment_id", out var paymentIdStr) &&
+                int.TryParse(paymentIdStr, out int paymentId))
             {
-                payment.Status = PaymentStatus.CANCELLED.ToString();
-                await _paymentRepository.UpdateAsync(payment);
-                await _paymentRepository.SaveChangesAsync();
+                payment = await _paymentRepository.GetByIdAsync(paymentId);
+            }
 
-                var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
-                if (reservation != null)
-                {
-                    reservation.Status = ReservationStatus.CANCELLED;
-                    await _reservationRepository.UpdateAsync(reservation);
-                    await _reservationRepository.SaveChangesAsync();
-                }
+            if (payment == null && !string.IsNullOrEmpty(charge.PaymentIntentId))
+            {
+                var allPayments = await _paymentRepository.GetAllAsync();
+                payment = allPayments.FirstOrDefault(p => p.StripePaymentIntentId == charge.PaymentIntentId);
+            }
+
+            if (payment == null) return;
+
+            payment.Status = PaymentStatus.CANCELLED.ToString();
+            await _paymentRepository.UpdateAsync(payment);
+
+            var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
+            if (reservation != null)
+            {
+                reservation.Status = ReservationStatus.CANCELLED;
+                await _reservationRepository.UpdateAsync(reservation);
             }
         }
+        
     }
 }
+

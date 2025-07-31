@@ -35,6 +35,9 @@ builder.Services.AddDbContext<AppDbContext>(
         options => options.UseSqlServer(
             builder.Configuration.GetConnectionString("DefaultConnection")
         )
+           .EnableSensitiveDataLogging() // mostra parâmetros reais - dps remover apenas para testes
+           .EnableDetailedErrors()       // mostra detalhes do erro - dps remover apenas para testes
+           .LogTo(Console.WriteLine, LogLevel.Information) // joga no console - dps remover apenas para testes
     );
 
 // Configura Identity
@@ -179,6 +182,7 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine($"Erro ao popular o DB com as Roles: {ex.Message}");
     }
+
 }
 
 // Configure the HTTP request pipeline.

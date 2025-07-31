@@ -44,11 +44,6 @@ namespace GoDecola.API.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
-
         public async Task DeleteAsync(int id)
         {
             var existingReservation = await GetByIdAsync(id);

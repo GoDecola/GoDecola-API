@@ -1,6 +1,7 @@
 ﻿using GoDecola.API.Data;
 using GoDecola.API.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace GoDecola.API.Repositories
 {
@@ -36,10 +37,6 @@ namespace GoDecola.API.Repositories
         public async Task UpdateAsync(Payment payment)
         {
             _context.Payments.Update(payment);
-            await _context.SaveChangesAsync();
-        }
-        public async Task SaveChangesAsync()
-        {
             await _context.SaveChangesAsync();
         }
 
