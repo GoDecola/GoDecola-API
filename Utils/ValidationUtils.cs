@@ -52,7 +52,7 @@ namespace GoDecola.API.Utils
         public static bool IsValidPassport(string passport)
         {
             if (string.IsNullOrWhiteSpace(passport))
-                return false;
+                return true;
 
             passport = passport.Trim().ToUpper();
 
