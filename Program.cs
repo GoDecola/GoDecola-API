@@ -1,3 +1,4 @@
+using GoDecola.API.Controllers;
 using GoDecola.API.Data;
 using GoDecola.API.Entities;
 using GoDecola.API.Profiles;
@@ -18,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var secretKey = builder.Configuration["Jwt:SecretKey"];
 
-var key = Encoding.ASCII.GetBytes(secretKey);
+var key = Encoding.ASCII.GetBytes(secretKey!);
 
 builder.Services.AddScoped<JwtService>(
     serviceProvider =>
@@ -26,7 +27,7 @@ builder.Services.AddScoped<JwtService>(
         // injeta o UserManager<User> no JwtService
         var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
 
-        return new JwtService(secretKey, userManager);
+        return new JwtService(secretKey!, userManager);
     }
 );
 
@@ -35,6 +36,9 @@ builder.Services.AddDbContext<AppDbContext>(
         options => options.UseSqlServer(
             builder.Configuration.GetConnectionString("DefaultConnection")
         )
+           .EnableSensitiveDataLogging() // mostra par√¢metros reais - dps remover apenas para testes
+           .EnableDetailedErrors()       // mostra detalhes do erro - dps remover apenas para testes
+           .LogTo(Console.WriteLine, LogLevel.Information) // joga no console - dps remover apenas para testes
     );
 
 // Configura Identity
@@ -52,14 +56,14 @@ builder.Services.AddAuthentication(options =>
 .AddJwtBearer(
     options =>
     {
-        options.RequireHttpsMetadata = false; // alterar para true em produÁ„o
+        options.RequireHttpsMetadata = false; // alterar para true em produ√ß√£o
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false, // alterar para true em produÁ„o
-            ValidateAudience = false, // alterar para true em produÁ„o
+            ValidateIssuer = false, // alterar para true em produ√ß√£o
+            ValidateAudience = false, // alterar para true em produ√ß√£o
         };
     }
 );
@@ -75,26 +79,32 @@ builder.Services.AddScoped<IRepository<Payment, int>, PaymentRepository>();
 builder.Services.AddScoped<ReservationRepository>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 
-// Services
 builder.Services.AddScoped<IPaymentService>(provider =>
 {
     var reservationRepo = provider.GetRequiredService<IRepository<Reservation, int>>();
     var paymentRepo = provider.GetRequiredService<IRepository<Payment, int>>();
+    var logger = provider.GetRequiredService<ILogger<WebhookController>>(); // Logger para registrar eventos do Stripe, remover dps
 
-    var stripeOptions = builder.Configuration.GetSection("Stripe").Get<StripeSettings>();
+    var stripeConfig = builder.Configuration.GetSection("Stripe");
+    var stripeSettings = new StripeSettings
+    {
+        PublishableKey = stripeConfig["PublishableKey"] ?? throw new Exception("PublishableKey n√£o configurado"),
+        SecretKey = stripeConfig["SecretKey"] ?? throw new Exception("SecretKey n√£o configurado")
+    };
 
-    // URLs para redirecionamento apÛs o pagamento com Stripe:
-    // - SuccessUrl: para onde o usu·rio ser· enviado apÛs pagamento sucedido
-    // - CancelUrl: para onde o usu·rio ser· enviado caso cancele o pagamento
-    var successUrl = builder.Configuration["Stripe:SuccessUrl"];
-    var cancelUrl = builder.Configuration["Stripe:CancelUrl"];
+    string successUrl = stripeConfig["SuccessUrl"] ?? throw new Exception("SuccessUrl n√£o configurado");
+    string cancelUrl = stripeConfig["CancelUrl"] ?? throw new Exception("CancelUrl n√£o configurado");
 
-    return new PaymentService(reservationRepo, paymentRepo, stripeOptions, successUrl, cancelUrl);
+    // Aqui: retorna a inst√¢ncia do PaymentService, n√£o registra outro servi√ßo dentro
+    return new PaymentService(
+        reservationRepo,
+        paymentRepo,
+        stripeSettings,
+        logger, //remover dps
+        successUrl,
+        cancelUrl
+    );
 });
-
-// Configura Stripe
-builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
-StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe")["SecretKey"]; // Configura a chave secreta da Stripe
 
 // CORS
 builder.Services.AddCors(
@@ -178,6 +188,7 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine($"Erro ao popular o DB com as Roles: {ex.Message}");
     }
+
 }
 
 // Configure the HTTP request pipeline.

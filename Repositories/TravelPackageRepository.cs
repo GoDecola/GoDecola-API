@@ -1,16 +1,19 @@
 ﻿using GoDecola.API.Data;
 using GoDecola.API.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace GoDecola.API.Repositories
 {
     public class TravelPackageRepository : IRepository<TravelPackage, int>
     {
         private readonly AppDbContext _context;
+        
 
         public TravelPackageRepository(AppDbContext context)
         {
             _context = context;
+           
         }
 
         public async Task<IEnumerable<TravelPackage>> GetAllAsync()
@@ -52,6 +55,7 @@ namespace GoDecola.API.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
 
     }
 }

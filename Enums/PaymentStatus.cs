@@ -4,9 +4,9 @@ namespace GoDecola.API.Enums
 {
     public enum PaymentStatus
     {
-        PENDING,
-        CONFIRMED,
-        FAILED,
-        CANCELLED,
+        PENDING ,
+        CONFIRMED ,
+        FAILED ,
+        CANCELLED
     }
 }
