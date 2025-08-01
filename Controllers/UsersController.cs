@@ -6,9 +6,11 @@ using GoDecola.API.DTOs.UserDTOs;
 using GoDecola.API.Entities;
 using GoDecola.API.Enums;
 using GoDecola.API.Repositories;
+using GoDecola.API.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,86 +37,141 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = nameof(UserType.ADMIN))]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Create(AdminCreateUserDTO create)
         {
-            if (string.IsNullOrWhiteSpace(create.Role))
-                return BadRequest("A role é obrigatória (ADMIN, SUPPORT ou USER).");
+            // validar cpf/rne do administrador
+            if (string.IsNullOrWhiteSpace(create.Document))
+                return BadRequest("Insira um CPF ou RNE válido.");
 
-            var novoUsuario = new User
+            string doc = create.Document.Trim();
+
+            bool documentoValido = false;
+            bool isCPF = false;
+            string? CPF = null;
+            string? RNE = null;
+
+            if (doc.Length == 11)
+            {
+                documentoValido = ValidationUtils.IsValidCPF(doc);
+                isCPF = true;
+                CPF = doc;
+            }
+            else if (doc.Length == 8)
+            {
+                documentoValido = ValidationUtils.IsValidRNE(doc);
+                RNE = doc;
+            }
+            else
+            {
+                return BadRequest("É obrigatório informar um CPF ou RNE válido.");
+            }
+
+            if (!documentoValido)
+                return BadRequest("Documento inválido.");
+
+            if (isCPF && await _userManager.Users.AnyAsync(u => u.CPF == CPF))
+                return BadRequest("Já existe um usuário com este CPF.");
+
+            if (!isCPF && await _userManager.Users.AnyAsync(u => u.RNE == RNE))
+                return BadRequest("Já existe um usuário com este RNE.");
+
+
+            var newUser = new User
             {
                 FirstName = create.FirstName,
                 LastName = create.LastName,
                 UserName = create.Email,
                 Email = create.Email,
-                CPF = create.CPF,
-                RNE = create.RNE,
-                Passaport = create.Passaport
+                CPF = CPF,
+                RNE = RNE
             };
 
-            var resultado = await _userManager.CreateAsync(novoUsuario, create.Password!);
+            var result = await _userManager.CreateAsync(newUser, create.Password!);
 
-            if (!resultado.Succeeded)
-                return BadRequest(resultado.Errors);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
 
-            var roleResult = await _userManager.AddToRoleAsync(novoUsuario, create.Role.ToUpper());
+            var roleResult = await _userManager.AddToRoleAsync(newUser, create.Role.ToUpper());
 
             if (!roleResult.Succeeded)
                 return BadRequest(roleResult.Errors);
 
             return CreatedAtAction(nameof(GetByIdOrDocument),
-                new { idOrDocument = novoUsuario.Id },
+                new { idOrDocument = newUser.Id },
                 new
                 {
                     message = "Usuário cadastrado com sucesso!",
-                    user = _mapper.Map<UserDTO>(novoUsuario)
+                    user = _mapper.Map<UserDTO>(newUser)
                 });
         }
 
         [HttpGet]
-        [Authorize(Roles = nameof(UserType.ADMIN))]
+        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetAll()
         {
-            var usuarios = await _userManager.Users.ToListAsync();
-            return Ok(_mapper.Map<IEnumerable<UserDTO>>(usuarios));
+            var users = await _userManager.Users.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<UserDTO>>(users));
         }
-        // passar as roles de string para enum
+
         [HttpGet("{idOrDocument}")]
-        [Authorize(Roles = $"{nameof(UserType.ADMIN)}, {nameof(UserType.SUPPORT)}, {nameof(UserType.USER)}")]
+        [Authorize(Roles = "ADMIN, SUPPORT, USER")]
         public async Task<ActionResult<UserDTO>> GetByIdOrDocument(string idOrDocument)
         {
-            User? usuario;
+            User? users;
 
-            // Tenta buscar por ID
-            if (Guid.TryParse(idOrDocument, out var guid))
+            // tenta buscar por id ou cpf/rnee
+
+            if (Guid.TryParse(idOrDocument, out _))
             {
-                usuario = await _userManager.FindByIdAsync(idOrDocument);
+                users = await _userManager.FindByIdAsync(idOrDocument);
             }
             else
             {
-                // Se não for, tenta por CPF ou RNE
-                usuario = await _context.Users
-                    .FirstOrDefaultAsync(u => u.CPF == idOrDocument || u.RNE == idOrDocument);
+                string doc = idOrDocument.Trim();
+
+                if (doc.Length == 11)
+                {
+                    users = await _context.Users.FirstOrDefaultAsync(u => u.CPF == doc);
+                }
+                else if (doc.Length == 8)
+                {
+                    users = await _context.Users.FirstOrDefaultAsync(u => u.RNE == doc);
+                }
+                else
+                {
+                    return BadRequest("Informe um ID, CPF ou RNE válido.");
+                }
             }
 
-            if (usuario == null)
+            if (users == null)
                 return NotFound("Usuário não encontrado.");
 
-            return Ok(_mapper.Map<UserDTO>(usuario));
+            return Ok(_mapper.Map<UserDTO>(users));
         }
 
         // Atualiza os dados - exceto documento
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{nameof(UserType.ADMIN)}, {nameof(UserType.SUPPORT)}, {nameof(UserType.USER)}")]
+        [Authorize(Roles = "ADMIN, SUPPORT, USER")]
         public async Task<IActionResult> Update(string id, UpdateUserDTO dados)
         {
             var usuario = await _userManager.FindByIdAsync(id);
             if (usuario == null)
                 return NotFound("Usuário não encontrado.");
 
-            if (usuario.CPF != dados.CPF || usuario.RNE != dados.RNE)
-                return BadRequest("CPF ou RNE não podem ser alterados.");
+            // verifica tentativa de alterar cpf ou rne
+            if (!string.IsNullOrWhiteSpace(dados.Document))
+            {
+                string doc = dados.Document.Trim();
 
+                if (doc.Length == 11 && usuario.CPF != doc)
+                    return BadRequest("CPF não pode ser alterado.");
+
+                if (doc.Length == 9 && usuario.RNE != doc)
+                    return BadRequest("RNE não pode ser alterado.");
+            }
+
+            // atualiza dados permitidos 
             usuario.FirstName = dados.FirstName;
             usuario.LastName = dados.LastName;
             usuario.Email = dados.Email;
@@ -129,7 +186,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{nameof(UserType.ADMIN)}, {nameof(UserType.SUPPORT)}, {nameof(UserType.USER)}")]
+        [Authorize(Roles = "ADMIN, SUPPORT, USER")]
         public async Task<IActionResult> DeleteById(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -162,7 +219,7 @@ namespace GoDecola.API.Controllers
             return Ok("Usuário excluído com sucesso.");
         }
         [HttpGet("{userId}/reservations")]
-        [Authorize(Roles = $"{nameof(UserType.ADMIN)}, {nameof(UserType.SUPPORT)}, {nameof(UserType.USER)}")]
+        [Authorize(Roles = "ADMIN, SUPPORT, USER")]
         public async Task<IActionResult> GetUserReservations(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
