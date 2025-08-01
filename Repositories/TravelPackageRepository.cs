@@ -19,6 +19,7 @@ namespace GoDecola.API.Repositories
                 .Include(tp => tp.Medias) // inclui as midias relacionadas
                 .Include(tp => tp.AccommodationDetails) // inclui os detalhes de acomodação
                     .ThenInclude(ad => ad.Address) // inclui o endereço relacionado aos detalhes de acomodação
+                .Include(tp => tp.Reviews)
                 .ToListAsync(); // lista todos os pacotes de viagem
         }
 
@@ -27,7 +28,8 @@ namespace GoDecola.API.Repositories
             return await _context.TravelPackages
                 .Include(tp => tp.Medias) 
                 .Include(tp => tp.AccommodationDetails) 
-                    .ThenInclude(ad => ad.Address) 
+                    .ThenInclude(ad => ad.Address)
+                .Include(tp => tp.Reviews)
                 .FirstOrDefaultAsync(tp => tp.Id == id); // busca pelo Id
         }
 

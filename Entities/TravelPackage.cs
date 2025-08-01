@@ -50,5 +50,18 @@ namespace GoDecola.API.Entities
                 return true;
             }
         }
+
+        [NotMapped] 
+        public double? AverageRating
+        {
+            get
+            {
+                if (Reviews == null || !Reviews.Any())
+                {
+                    return null;
+                }
+                return Math.Round(Reviews.Average(r => r.Rating), 1);
+            }
+        }
     }
 }

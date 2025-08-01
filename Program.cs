@@ -72,8 +72,10 @@ builder.Services.AddScoped<IRepository<User, string>, UserRepository>();
 builder.Services.AddScoped<IRepository<TravelPackage, int>, TravelPackageRepository>();
 builder.Services.AddScoped<IRepository<Reservation, int>, ReservationRepository>();
 builder.Services.AddScoped<IRepository<Payment, int>, PaymentRepository>();
-builder.Services.AddScoped<ReservationRepository>();
+//builder.Services.AddScoped<ReservationRepository>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IMediaService, MediaService>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 // Services
 builder.Services.AddScoped<IPaymentService>(provider =>
@@ -159,8 +161,6 @@ builder.Services.AddSwaggerGen(
 
 var app = builder.Build();
 
-app.UseCors("AllowAllOrigins");
-
 // SeedData
 using (var scope = app.Services.CreateScope())
 {
@@ -188,11 +188,13 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseAuthentication();
-
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+app.UseCors("AllowAllOrigins");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

@@ -92,7 +92,7 @@ namespace GoDecola.API.Data
                 entity.HasOne(r => r.User) // uma avaliação tem 01 usuário
                     .WithMany() // 01 usuário pode ter várias avaliações
                     .HasForeignKey(r => r.UserId) // fk
-                    .OnDelete(DeleteBehavior.Restrict); // não exclui usuário se houver avaliações
+                    .OnDelete(DeleteBehavior.Cascade);
             });
                 
 
