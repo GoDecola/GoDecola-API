@@ -27,7 +27,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPost("{id}/media")]
-        [Authorize (Roles = nameof(UserType.ADMIN))]
+        [Authorize ("ADMIN")]
         public async Task<IActionResult> UploadMedia(int id, [FromForm] List<IFormFile> files)
         {
             var travelPackage = await _travelPackageRepository.GetByIdAsync(id);
@@ -84,7 +84,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = nameof(UserType.ADMIN))]
+        [Authorize("ADMIN")]
         public async Task<IActionResult> Create(CreateTravelPackageDTO travelPackage)
         {
             var newTravelPackage = _mapper.Map<TravelPackage>(travelPackage);
@@ -101,7 +101,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = nameof(UserType.ADMIN))]
+        [Authorize("ADMIN")]
         public async Task<IActionResult> Update(int id, UpdateTravelPackageDTO travelPackage)
         {
             var existingTravelPackage = await _travelPackageRepository.GetByIdAsync(id);
@@ -119,7 +119,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = nameof(UserType.ADMIN))]
+        [Authorize("ADMIN")]
         public async Task<IActionResult> Delete(int id)
         {
             var travelPackage = await _travelPackageRepository.GetByIdAsync(id);
@@ -130,5 +130,17 @@ namespace GoDecola.API.Controllers
             await _travelPackageRepository.DeleteAsync(id);
             return NoContent();
         }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TravelPackageDTO>>> GetAll([FromQuery] TravelPackageFilterDto? filter)
+        {
+            var repo = _travelPackageRepository as TravelPackageRepository;
+            if (repo == null)
+                return StatusCode(500, "Repository inválido para TravelPackage");
+
+            var travelPackages = await repo.GetAllAsync(filter);
+            return Ok(_mapper.Map<IEnumerable<TravelPackageDTO>>(travelPackages));
+        }
+
     }
 }

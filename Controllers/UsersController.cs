@@ -35,7 +35,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = nameof(UserType.ADMIN))]
+        [Authorize("ADMIN")]
         public async Task<IActionResult> Create(AdminCreateUserDTO create)
         {
             if (string.IsNullOrWhiteSpace(create.Role))
