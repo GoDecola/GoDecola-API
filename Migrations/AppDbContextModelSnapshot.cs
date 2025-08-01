@@ -298,11 +298,11 @@ namespace GoDecola.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("MediaType")
-                        .IsRequired()
+                    b.Property<string>("FilePath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MediaUrl")
+                    b.Property<string>("MimeType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TravelPackageId")

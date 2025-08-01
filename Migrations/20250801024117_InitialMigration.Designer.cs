@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoDecola.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250731170241_InitialMigration")]
+    [Migration("20250801024117_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -269,8 +269,9 @@ namespace GoDecola.API.Migrations
                     b.Property<int>("NumberGuests")
                         .HasColumnType("int");
 
-                    b.Property<int>("PackageType")
-                        .HasColumnType("int");
+                    b.Property<string>("PackageType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("Price")
                         .HasColumnType("bigint");
@@ -300,10 +301,11 @@ namespace GoDecola.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("MediaType")
-                        .HasColumnType("int");
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MediaUrl")
+                    b.Property<string>("MimeType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TravelPackageId")
