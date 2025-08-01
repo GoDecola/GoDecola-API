@@ -14,6 +14,7 @@ namespace GoDecola.API.Data
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Guests> Guests { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -81,6 +82,19 @@ namespace GoDecola.API.Data
                 .WithMany() // 01 reserva pode ter vários pagamentos
                 .HasForeignKey(p => p.ReservationId) // fk
                 .OnDelete(DeleteBehavior.Restrict); // não exclui reserva se houver pagamentos
+
+            // ------------------- REVIEWS ----------------------
+
+            builder.Entity<Review>(entity =>
+            {
+                entity.HasIndex(r => new { r.UserId, r.TravelPackageId }).IsUnique(); // um usuário só possa avaliar um pacote de viagem uma vez
+
+                entity.HasOne(r => r.User) // uma avaliação tem 01 usuário
+                    .WithMany() // 01 usuário pode ter várias avaliações
+                    .HasForeignKey(r => r.UserId) // fk
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+                
 
         }
     }

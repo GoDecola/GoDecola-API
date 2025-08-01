@@ -9,7 +9,6 @@
         public string? CPF { get; set; }
         public string? RNE { get; set; }
         public string? Passaport { get; set; }
-        
-
+        public DateTime CreatedAt { get; set; }
     }
 }

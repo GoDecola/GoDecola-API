@@ -49,7 +49,8 @@ namespace GoDecola.API.Controllers
                 Email = create.Email,
                 CPF = create.CPF,
                 RNE = create.RNE,
-                Passaport = create.Passaport
+                Passaport = create.Passaport,
+                CreatedAt = DateTime.UtcNow
             };
 
             var resultado = await _userManager.CreateAsync(novoUsuario, create.Password!);
