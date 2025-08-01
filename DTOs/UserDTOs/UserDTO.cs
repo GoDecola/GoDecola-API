@@ -8,7 +8,6 @@
         public string? Email { get; set; }
         public string? Document { get; set; } // pode ser cpf ou rne
         public string? Passaport { get; set; }
-        
-
+        public DateTime CreatedAt { get; set; }
     }
 }

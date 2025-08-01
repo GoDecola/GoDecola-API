@@ -5,13 +5,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GoDecola.API.Repositories
 {
-    public class ReservationRepository : IRepository<Reservation, int>
+    public class ReservationRepository : IReservationRepository
     {
         private readonly AppDbContext _context;
 
         public ReservationRepository(AppDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<Reservation?> FindOneWithDetailsAsync(System.Linq.Expressions.Expression<Func<Reservation, bool>> predicate)
+        {
+            return await _context.Reservations
+                .Include(r => r.TravelPackage) // Importante para checar a EndDate no controller
+                .FirstOrDefaultAsync(predicate);
         }
 
         public async Task<IEnumerable<Reservation>> GetAllAsync()

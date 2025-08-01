@@ -11,6 +11,6 @@ namespace GoDecola.API.DTOs.UserDTOs
         public string Password { get; set; } = string.Empty;
         public string? Document { get; set; } // pode ser cpf ou rne
         public string? Passaport { get; set; }
-
+        public DateTime CreatedAt { get; set; }
     }
 }

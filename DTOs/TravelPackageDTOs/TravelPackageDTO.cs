@@ -21,6 +21,6 @@ namespace GoDecola.API.DTOs.TravelPackageDTOs
         public double? DiscountPercentage { get; set; }
         public DateTime? PromotionStartDate { get; set; }
         public DateTime? PromotionEndDate { get; set; }
-
+        public double? AverageRating { get; set; }
     }
 }
