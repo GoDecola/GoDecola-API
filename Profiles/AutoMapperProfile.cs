@@ -14,7 +14,14 @@ namespace GoDecola.API.Profiles
         {
             // ------------------------ USER ---------------------------------
 
-            CreateMap<User, UserDTO>();
+            CreateMap<User, UserDTO>()
+                // preencher o campo 'Document' com CPF ou RNE
+                .ForMember(dest => dest.Document, opt =>
+                    opt.MapFrom(src =>
+                        !string.IsNullOrWhiteSpace(src.CPF)
+                            ? src.CPF
+                            : (!string.IsNullOrWhiteSpace(src.RNE) ? src.RNE : null)
+                    ));
             CreateMap<CreateUserDTO, User>();
             CreateMap<UpdateUserDTO, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
