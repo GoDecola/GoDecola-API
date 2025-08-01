@@ -863,7 +863,7 @@ namespace GoDecola.API.Data
                             new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/packageId_15B.jpg", UploadDate = DateTime.UtcNow, MimeType = "image/jpeg" },
                             new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/packageId_15C.jpg", UploadDate = DateTime.UtcNow, MimeType = "image/jpeg" },
                             new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/packageId_15D.jpg", UploadDate = DateTime.UtcNow, MimeType = "image/jpeg" },
-                            new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/packageId_15.mp4", UploadDate = DateTime.UtcNow, MimeType = "video/mp4" },
+                            new TravelPackageMedia { FilePath = "/Medias/Videos/TravelPackage/packageId_15.mp4", UploadDate = DateTime.UtcNow, MimeType = "video/mp4" },
                         }
                     },
                     new TravelPackage // id 16
@@ -1007,7 +1007,7 @@ namespace GoDecola.API.Data
                             new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/packageId_19C.jpg", UploadDate = DateTime.UtcNow, MimeType = "image/jpeg" },
                             new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/packageId_19D.jpg", UploadDate = DateTime.UtcNow, MimeType = "image/jpeg" },
                             new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/packageId_19E.jpg", UploadDate = DateTime.UtcNow, MimeType = "image/jpeg" },
-                            new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/packageId_19.mp4", UploadDate = DateTime.UtcNow, MimeType = "video/mp4" },
+                            new TravelPackageMedia { FilePath = "/Medias/Videos/TravelPackage/packageId_19.mp4", UploadDate = DateTime.UtcNow, MimeType = "video/mp4" },
                         }
                     },
                     new TravelPackage // id 20

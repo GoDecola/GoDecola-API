@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoDecola.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250801024117_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20250801182453_InitialDaMigration")]
+    partial class InitialDaMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
