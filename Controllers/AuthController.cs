@@ -56,7 +56,7 @@ namespace GoDecola.API.Controllers
                 isCPF = true;
                 CPF = doc;
             }
-            else if (doc.Length == 9)
+            else if (doc.Length == 8)
             {
                 documentoValido = ValidationUtils.IsValidRNE(doc);
                 isCPF = false;
