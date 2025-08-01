@@ -80,6 +80,8 @@ builder.Services.AddScoped<IRepository<Payment, int>, PaymentRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
+
 
 builder.Services.AddScoped<IPaymentService>(provider =>
 {
