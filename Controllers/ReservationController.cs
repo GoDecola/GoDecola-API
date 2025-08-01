@@ -73,7 +73,8 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "ADMIN, SUPPORT")]
+        [Authorize(Roles = $"{nameof(UserType.ADMIN)},{nameof(UserType.SUPPORT)}")]
+
         public async Task<ActionResult<IEnumerable<ReservationDTO>>> GetAll()
         {
             var reservations = await _reservationRepository.GetAllAsync();
