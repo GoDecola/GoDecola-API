@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using GoDecola.API.Entities;
+using System.Linq.Expressions;
 
 namespace GoDecola.API.Repositories
 {
