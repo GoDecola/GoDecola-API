@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace GoDecola.API.Controllers
 {
@@ -33,26 +35,57 @@ namespace GoDecola.API.Controllers
         [HttpPost("signup")]
         public async Task<IActionResult> SignUp(CreateUserDTO register)
         {
-            bool cpfValido = !string.IsNullOrWhiteSpace(register.CPF) && ValidationUtils.IsValidCPF(register.CPF);
-            bool rneValido = !string.IsNullOrWhiteSpace(register.RNE) && ValidationUtils.IsValidRNE(register.RNE);
+            // Documento: CPF e RNE 
 
-            // passaporte é validado caso o campo esteja preenchido
-            bool passaportInformado = !string.IsNullOrWhiteSpace(register.Passaport);
-            bool passaportValido = !passaportInformado || ValidationUtils.IsValidPassport(register.Passaport);
 
-            if (!cpfValido && !rneValido)
+            // vrifica se o campo do documento está preenchido
+            if (string.IsNullOrWhiteSpace(register.Document))
+                return BadRequest("Insira um CPF ou RNE válido.");
+
+            string doc = register.Document.Trim();
+
+            bool documentoValido = false;
+            bool isCPF = false;
+            string? CPF = null;
+            string? RNE = null;
+
+            // validação de cpf e rne com base no tamanho do documento
+            if (doc.Length == 11)
+            {
+                documentoValido = ValidationUtils.IsValidCPF(doc);
+                isCPF = true;
+                CPF = doc;
+            }
+            else if (doc.Length == 9)
+            {
+                documentoValido = ValidationUtils.IsValidRNE(doc);
+                isCPF = false;
+                RNE = doc;
+            }
+            else
+            {
                 return BadRequest("É obrigatório informar um CPF ou RNE válido.");
-            // se passaporte for informado e não for válido, retorna erro
-            if (passaportInformado && !passaportValido)
-                return BadRequest("Informe um passaporte válido.");
+            }
+
+            // valdar se cpf/rne paassou na função de validação
+            if (!documentoValido)
+                return BadRequest("Documento inválido.");
 
             // Verifica duplicidade de cpf
-            if (cpfValido && await _userManager.Users.AnyAsync(u => u.CPF == register.CPF))
+            if (isCPF && await _userManager.Users.AnyAsync(u => u.CPF == CPF))
                 return BadRequest("Já existe um usuário com este CPF.");
 
             // Verifica duplicidade de rne
-            if (rneValido && await _userManager.Users.AnyAsync(u => u.RNE == register.RNE))
+            if (!isCPF && await _userManager.Users.AnyAsync(u => u.RNE == RNE))
                 return BadRequest("Já existe um usuário com este RNE.");
+
+            // Passaporte 
+            bool passaportInformado = !string.IsNullOrWhiteSpace(register.Passaport);
+            bool passaportValido = !passaportInformado || ValidationUtils.IsValidPassport(register.Passaport);
+
+            // se passaporte for informado e não for válido, retorna erro
+            if (passaportInformado && !passaportValido)
+                return BadRequest("Informe um passaporte válido.");
 
             // Verifica duplicidade de passaporteee
             // se passaporte informado ele verifica se já existe um usuário com o mesmo passaporte, se nao for informado, não verifica
@@ -65,8 +98,8 @@ namespace GoDecola.API.Controllers
                 LastName = register.LastName,
                 UserName = register.Email,
                 Email = register.Email,
-                CPF = register.CPF,
-                RNE = register.RNE,
+                CPF = CPF, // se for rne, será null
+                RNE = RNE, // se for cpf, será null
                 Passaport = register.Passaport,
             };
 
