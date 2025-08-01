@@ -6,9 +6,7 @@
         public required string LastName { get; set; }
         public required string Email { get; set; }
         public required string Password { get; set; }
-        public string? CPF { get; set; }
-        public string? RNE { get; set; }
-        public string? Passaport { get; set; }
+        public string? Document { get; set; }
         public required string Role { get; set; }
     }
 }

@@ -45,8 +45,8 @@ namespace GoDecola.API.Utils
 
             rne = rne.Trim();
 
-            // aceita letras e números mínimo 9 caracteres
-            return Regex.IsMatch(rne, @"^[A-Za-z0-9]{9,12}$");
+            // 1 letra + 6 números + 1 número (verificador)
+            return Regex.IsMatch(rne, @"^[A-Z]{1}\d{7}$");
         }
 
         public static bool IsValidPassport(string passport)
