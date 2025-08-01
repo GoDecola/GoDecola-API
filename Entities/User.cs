@@ -12,7 +12,7 @@ namespace GoDecola.API.Entities
         public string? CPF { get; set; }
         public string? RNE { get; set; }
         public string? Passaport { get; set; }
-        
         ICollection<Reservation>? Reservations { get; set; } // lista de reservas associadas ao usuário
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // data de criação do usuário
     }
 }

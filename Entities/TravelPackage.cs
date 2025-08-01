@@ -16,6 +16,7 @@ namespace GoDecola.API.Entities
         public int NumberGuests { get; set; }
         public AccommodationDetails AccommodationDetails { get; set; } = new AccommodationDetails();
         public ICollection<TravelPackageMedia> Medias { get; set; } = new List<TravelPackageMedia>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public PackageType PackageType { get; set; }
         public double? DiscountPercentage { get; set; } // ex: 0.10 para 10% de desconto
         public DateTime? PromotionStartDate { get; set; }
