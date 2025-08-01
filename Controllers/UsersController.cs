@@ -83,9 +83,8 @@ namespace GoDecola.API.Controllers
                 LastName = create.LastName,
                 UserName = create.Email,
                 Email = create.Email,
-                CPF = create.CPF,
-                RNE = create.RNE,
-                Passaport = create.Passaport,
+                CPF = CPF,
+                RNE = RNE,
                 CreatedAt = DateTime.UtcNow
             };
 
