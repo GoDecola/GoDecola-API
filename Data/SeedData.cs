@@ -1,5 +1,6 @@
 ﻿using GoDecola.API.Entities;
 using GoDecola.API.Enums;
+using GoDecola.API.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,6 +66,48 @@ namespace GoDecola.API.Data
                     await userManager.AddToRoleAsync(supportUser, UserType.SUPPORT.ToString());
                 }
             }
+
+            // popular o banco de dados com usuários
+            var clientes = new List<(string firstName, string lastName, string phone, string email, string? document, string? passaport)>
+            {
+                ("Ozzy", "Osbourne", "osbourne666@email.com", "11966666666", "63834033030", "AB987654"),
+                ("Lars", "Ulrich", "ulrich@email.com", "21988888888", "A1234567", null),
+                ("Eren", "Yeager", "yeager@email.com", "11958658963", "23456789012", null),
+                ("Paul", "McCartney", "mccartney@email.com", "11911112222", "24681128066", "XR102938"),
+                ("Bob", "Dylan", "dylan@email.com", "61955556666", "B1234567", "ZL445566"),
+                ("Kate", "Bush", "bush@email.com", "11965325698", "25757753021", null),
+                ("Frank", "Sinatra", "sinatra@email.com", "11936326589", "62065297034", null),
+                ("Edward", "Elric", "edwardelric@automail.com", "11912345678", "49478599038", null),
+                ("The", "Doctor", "tardis@email.com", "11969895236", "40729334066", null)
+            };
+
+            foreach (var (firstName, lastName, phone, email, document, passaport) in clientes)
+            {
+                var existingUser = await userManager.FindByEmailAsync(email);
+                if (existingUser == null)
+                {
+                    var user = new User
+                    {
+                        FirstName = firstName,
+                        LastName = lastName,
+                        Phone = phone,
+                        Email = email,
+                        UserName = email,
+                        CPF = document?.Length == 11 && ValidationUtils.IsValidCPF(document) ? document : null,
+                        RNE = document?.Length == 8 && ValidationUtils.IsValidRNE(document) ? document : null,
+                        Passaport = ValidationUtils.IsValidPassport(passaport) ? passaport : null,
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    var result = await userManager.CreateAsync(user, "GoDecola@123");
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(user, UserType.USER.ToString());
+                    }
+                }
+            }
+
+
 
             if (!context.TravelPackages.Any())
             {
