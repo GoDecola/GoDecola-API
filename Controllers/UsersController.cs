@@ -26,9 +26,12 @@ namespace GoDecola.API.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
-        private readonly ReservationRepository _reservationRepository;
+        private readonly IReservationRepository _reservationRepository;
 
-        public UsersController(UserManager<User> userManager, IMapper mapper, AppDbContext context, ReservationRepository reservationRepository)
+        public UsersController(
+            UserManager<User> userManager, 
+            IMapper mapper, AppDbContext context,
+            IReservationRepository reservationRepository)
         {
             _userManager = userManager;
             _mapper = mapper;
@@ -170,6 +173,20 @@ namespace GoDecola.API.Controllers
                     return BadRequest("RNE não pode ser alterado.");
             }
 
+            // regra de atualização de passaporte
+            if (!string.IsNullOrWhiteSpace(dados.Passaport))
+            {
+                if (!string.IsNullOrWhiteSpace(usuario.Passaport) && usuario.Passaport != dados.Passaport)
+                {
+                    return BadRequest("O passaporte não pode ser alterado após o cadastro.");
+                }
+
+                if (string.IsNullOrWhiteSpace(usuario.Passaport))
+                {
+                    usuario.Passaport = dados.Passaport;
+                }
+            }
+
             // atualiza dados permitidos 
             usuario.FirstName = dados.FirstName;
             usuario.LastName = dados.LastName;
@@ -181,7 +198,7 @@ namespace GoDecola.API.Controllers
             if (!resultado.Succeeded)
                 return BadRequest(resultado.Errors);
 
-            return NoContent();
+            return Ok("Passaporte atualizado com sucesso.");
         }
 
         [HttpDelete("{id}")]
