@@ -68,7 +68,7 @@ namespace GoDecola.API.Data
             }
 
             // popular o banco de dados com usuários
-            var clientes = new List<(string firstName, string lastName, string phone, string email, string? document, string? passaport)>
+            var clientes = new List<(string firstName, string lastName, string email, string phone, string? document, string? passaport)>
             {
                 ("Ozzy", "Osbourne", "osbourne666@email.com", "11966666666", "63834033030", "AB987654"),
                 ("Lars", "Ulrich", "ulrich@email.com", "21988888888", "A1234567", null),
@@ -81,7 +81,7 @@ namespace GoDecola.API.Data
                 ("The", "Doctor", "tardis@email.com", "11969895236", "40729334066", null)
             };
 
-            foreach (var (firstName, lastName, phone, email, document, passaport) in clientes)
+            foreach (var (firstName, lastName, email, phone, document, passaport) in clientes)
             {
                 var existingUser = await userManager.FindByEmailAsync(email);
                 if (existingUser == null)
@@ -90,9 +90,9 @@ namespace GoDecola.API.Data
                     {
                         FirstName = firstName,
                         LastName = lastName,
-                        Phone = phone,
                         Email = email,
                         UserName = email,
+                        Phone = phone,
                         CPF = document?.Length == 11 && ValidationUtils.IsValidCPF(document) ? document : null,
                         RNE = document?.Length == 8 && ValidationUtils.IsValidRNE(document) ? document : null,
                         Passaport = ValidationUtils.IsValidPassport(passaport) ? passaport : null,
