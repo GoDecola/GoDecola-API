@@ -15,6 +15,7 @@ namespace GoDecola.API.Data
         public DbSet<Guests> Guests { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<Wishlist> Wishlists { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -94,7 +95,25 @@ namespace GoDecola.API.Data
                     .HasForeignKey(r => r.UserId) // fk
                     .OnDelete(DeleteBehavior.Cascade);
             });
-                
+
+
+            // ----------- WISHLIST -----------
+
+            builder.Entity<Wishlist>(entity =>
+            {
+                entity.HasIndex(w => new { w.UserId, w.TravelPackageId }).IsUnique(); // para impedir duplicatas
+
+                entity.HasOne(w => w.User)
+                    .WithMany()
+                    .HasForeignKey(w => w.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(w => w.TravelPackage)
+                    .WithMany()
+                    .HasForeignKey(w => w.TravelPackageId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
 
         }
     }
