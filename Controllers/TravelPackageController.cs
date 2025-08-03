@@ -27,7 +27,7 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpGet("filter")]
-        public async Task<ActionResult<IEnumerable<TravelPackageDTO>>> SearchPackages([FromQuery]string? destination, [FromQuery]long? price, [FromQuery]DateTime? startDate)
+        public async Task<ActionResult<IEnumerable<TravelPackageDTO>>> SearchPackages([FromQuery] string? destination, [FromQuery] long? minPrice, [FromQuery] long? maxPrice, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
         {
             var allPackages = await _travelPackageRepository.GetAllAsync();
 
@@ -43,15 +43,23 @@ namespace GoDecola.API.Controllers
             }
 
             // filtro por preco (correspondencia exata)
-            if (price.HasValue)
+            if (minPrice.HasValue)
             {
-                allPackages = allPackages.Where(p => p.Price == price.Value);
+                allPackages = allPackages.Where(p => p.Price >= minPrice.Value);
+            }
+            if (maxPrice.HasValue)
+            {
+                allPackages = allPackages.Where(p => p.Price <= maxPrice.Value);
             }
 
             // filtro por data de inicio (pacotes que comecam na data informada ou depois)
             if (startDate.HasValue)
             {
-                allPackages = allPackages.Where(p => p.StartDate.Date >= startDate.Value.Date);
+                allPackages = allPackages.Where(p => p.StartDate.Date >= startDate.Value.Date); //
+            }
+            if (endDate.HasValue)
+            {
+                allPackages = allPackages.Where(p => p.StartDate.Date <= endDate.Value.Date);
             }
 
             return Ok(_mapper.Map<IEnumerable<TravelPackageDTO>>(allPackages));
