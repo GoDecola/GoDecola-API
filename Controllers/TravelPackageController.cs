@@ -26,6 +26,37 @@ namespace GoDecola.API.Controllers
             _mediaService = mediaService;
         }
 
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<TravelPackageDTO>>> SearchPackages([FromQuery]string? destination, [FromQuery]long? price, [FromQuery]DateTime? startDate)
+        {
+            var allPackages = await _travelPackageRepository.GetAllAsync();
+
+            // giltro por destino busca em 3 campos (TravelPackage.Destination, Address.City, Address.State)
+            if (!string.IsNullOrWhiteSpace(destination))
+            {
+                var searchTerm = destination.Trim().ToLower();
+                allPackages = allPackages.Where(p =>
+                    (p.Destination?.ToLower().Contains(searchTerm) == true) ||
+                    (p.AccommodationDetails?.Address?.City?.ToLower().Contains(searchTerm) == true) ||
+                    (p.AccommodationDetails?.Address?.State?.ToLower().Contains(searchTerm) == true)
+                );
+            }
+
+            // filtro por preco (correspondencia exata)
+            if (price.HasValue)
+            {
+                allPackages = allPackages.Where(p => p.Price == price.Value);
+            }
+
+            // filtro por data de inicio (pacotes que comecam na data informada ou depois)
+            if (startDate.HasValue)
+            {
+                allPackages = allPackages.Where(p => p.StartDate.Date >= startDate.Value.Date);
+            }
+
+            return Ok(_mapper.Map<IEnumerable<TravelPackageDTO>>(allPackages));
+        }
+
         [HttpPost("{id}/media")]
         [Authorize (Roles = nameof(UserType.ADMIN))]
         public async Task<IActionResult> UploadMedia(int id, [FromForm] List<IFormFile> files)
