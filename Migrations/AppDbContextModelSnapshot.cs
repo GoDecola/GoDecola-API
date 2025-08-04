@@ -257,6 +257,9 @@ namespace GoDecola.API.Migrations
                     b.Property<DateTime>("ReviewDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("TravelPackageId")
                         .HasColumnType("int");
 
