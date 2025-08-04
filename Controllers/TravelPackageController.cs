@@ -28,18 +28,16 @@ namespace GoDecola.API.Controllers
 
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<TravelPackageDTO>>> SearchPackages(
-    [FromQuery] string? destination,
-    [FromQuery] long? minPrice,
-    [FromQuery] long? maxPrice,
-    [FromQuery] DateTime? startDate,
-    [FromQuery] DateTime? endDate,
-    [FromQuery] int? numberGuests)
+        [FromQuery] string? destination,
+        [FromQuery] long? minPrice,
+        [FromQuery] long? maxPrice,
+        [FromQuery] DateTime? startDate,
+        [FromQuery] DateTime? endDate,
+        [FromQuery] int? numberGuests)
         {
-            var allPackages = await _travelPackageRepository.GetAllAsync();
-            Console.WriteLine($"Initial packages count: {allPackages.Count()}");
-            Console.WriteLine($"Received: destination={destination}, minPrice={minPrice}, maxPrice={maxPrice}, startDate={startDate:yyyy-MM-dd}, endDate={endDate:yyyy-MM-dd}, numberGuests={numberGuests}");
+            var allPackages = await _travelPackageRepository.GetAllAsync();            
 
-            // Filtro por destino
+            // Adicionado Filtro por Title
             if (!string.IsNullOrWhiteSpace(destination))
             {
                 var searchTerm = destination.Trim().ToLower();
@@ -48,51 +46,44 @@ namespace GoDecola.API.Controllers
                     (p.Destination?.ToLower().Contains(searchTerm) == true) ||                    
                     (p.AccommodationDetails?.Address?.City?.ToLower().Contains(searchTerm) == true) ||
                     (p.AccommodationDetails?.Address?.State?.ToLower().Contains(searchTerm) == true)
-                );
-                Console.WriteLine($"After destination filter: {allPackages.Count()}");
+                );                
             }
 
             // Filtro por número de hóspedes
             if (numberGuests.HasValue)
             {
-                allPackages = allPackages.Where(p => p.NumberGuests >= numberGuests.Value);
-                Console.WriteLine($"After numberGuests filter: {allPackages.Count()}");
+                allPackages = allPackages.Where(p => p.NumberGuests >= numberGuests.Value);                
             }
 
-            // Filtro por preço
+            // filtro por preco (correspondencia exata)
             if (minPrice.HasValue)
             {
-                allPackages = allPackages.Where(p => p.Price >= minPrice.Value);
-                Console.WriteLine($"After minPrice filter: {allPackages.Count()}");
+                allPackages = allPackages.Where(p => p.Price >= minPrice.Value);              
             }
             if (maxPrice.HasValue)
             {
-                allPackages = allPackages.Where(p => p.Price <= maxPrice.Value);
-                Console.WriteLine($"After maxPrice filter: {allPackages.Count()}");
+                allPackages = allPackages.Where(p => p.Price <= maxPrice.Value);                
             }
 
             // Filtro por intervalo de datas
             if (startDate.HasValue && endDate.HasValue)
             {
-                // Garantir que as datas sejam tratadas como UTC para consistência
+                // Garantindo que as datas sejam tratadas como UTC para consistência
                 var startDateUtc = startDate.Value.Date;
                 var endDateUtc = endDate.Value.Date;
                 allPackages = allPackages.Where(p =>
                     p.StartDate.Date <= startDateUtc &&
-                    p.EndDate.Date >= endDateUtc);
-                Console.WriteLine($"After date interval filter (startDate={startDateUtc:yyyy-MM-dd}, endDate={endDateUtc:yyyy-MM-dd}): {allPackages.Count()}");
+                    p.EndDate.Date >= endDateUtc);                
             }
             else if (startDate.HasValue)
             {
                 var startDateUtc = startDate.Value.Date;
-                allPackages = allPackages.Where(p => p.StartDate.Date <= startDateUtc);
-                Console.WriteLine($"After startDate filter (startDate={startDateUtc:yyyy-MM-dd}): {allPackages.Count()}");
+                allPackages = allPackages.Where(p => p.StartDate.Date <= startDateUtc);                
             }
             else if (endDate.HasValue)
             {
                 var endDateUtc = endDate.Value.Date;
-                allPackages = allPackages.Where(p => p.EndDate.Date >= endDateUtc);
-                Console.WriteLine($"After endDate filter (endDate={endDateUtc:yyyy-MM-dd}): {allPackages.Count()}");
+                allPackages = allPackages.Where(p => p.EndDate.Date >= endDateUtc);               
             }
 
             // Log dos pacotes retornados para depuração
