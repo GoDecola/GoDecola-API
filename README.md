@@ -15,9 +15,6 @@
 
 ## Diagrama Entidade Relacionamento ER
 
-![Diagrama Entidade Relacionamento ER](docs/diagrama-entidade-relacionamento.svg)
-
-
 ```mermaid
 ---
 config:
@@ -158,8 +155,6 @@ erDiagram
 > Diagrama de classes do projeto GoDecola API
 
 ## Arquitetura do Sistema
-
-![Arquitetura do Sistema](docs/arquitetura-sistema.svg)
 
 ```mermaid
 ---
