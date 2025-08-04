@@ -38,7 +38,7 @@ namespace GoDecola.API.Controllers
                 return NotFound($"Review {reviewId} não encontrada");
             }
 
-            review.Status = statusReview.Status.ToString();
+            review.Status = statusReview.Status;
 
             await _reviewRepository.UpdateAsync(review);
 
@@ -100,7 +100,7 @@ namespace GoDecola.API.Controllers
             var review = _mapper.Map<Review>(createReview);
             review.UserId = userId;
             review.ReviewDate = DateTime.UtcNow;
-            review.Status = ReviewStatus.PENDING.ToString();
+            review.Status = ReviewStatus.PENDING;
 
             var newReview = await _reviewRepository.AddAsync(review);
             var reviewDto = _mapper.Map<ReviewDTO>(newReview);
