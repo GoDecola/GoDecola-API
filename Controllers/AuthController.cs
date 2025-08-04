@@ -23,13 +23,71 @@ namespace GoDecola.API.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly JwtService _jwtService;
         private readonly IMapper _mapper;
+        private readonly IEmailService _emailService;
+        private readonly IConfiguration _config;
 
-        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, JwtService jwtService, IMapper mapper)
+        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, JwtService jwtService, IMapper mapper, IEmailService emailService, IConfiguration config)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtService = jwtService; 
             _mapper = mapper;
+            _emailService = emailService;
+            _config = config;
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDTO forgotPassword)
+        {
+            var user = await _userManager.FindByEmailAsync(forgotPassword.Email);
+
+            if (user == null)
+            {
+                return Ok(new { message = "Se o email estiver cadastrado, um link para redefinição de senha será enviado." }); // dessa forma nao revela se o email existe ou nao na base de dados
+            }
+
+            // gera o token de redefinicao de senha, o identity cuida da expiracao (1h por padrao)
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            // codifica o token pra ser usado na URL
+            var encodedToken = System.Net.WebUtility.UrlEncode(token);
+
+            var resetUrlBase = _config["FrontendSettings:ResetPasswordUrl"];
+            if (string.IsNullOrEmpty(resetUrlBase))
+            {
+                return StatusCode(500, "A URL de redefinição de senha não está configurada no servidor");
+            }
+
+            var resetUrl = $"{resetUrlBase}?token={encodedToken}&email={user.Email}";
+
+            await _emailService.SendForgotPasswordEmailAsync(
+                user.Email,
+                user.FirstName,
+                resetUrl
+            );
+
+            return Ok(new { message = "Se o email estiver cadastrado, um link para redefinição de senha será enviado." });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO resetPassword)
+        {
+            var user = await _userManager.FindByEmailAsync(resetPassword.Email);
+            if (user == null)
+            {
+                return BadRequest("Link de redefinição inválido ou expirado");
+            }
+
+            var decodedToken = System.Net.WebUtility.UrlDecode(resetPassword.Token);
+
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, resetPassword.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest("Não foi possível redefinir a senha. O link pode ter expirado ou ser inválido.");
+            }
+
+            return Ok(new { message = "Senha redefinida com sucesso!" });
         }
 
         [HttpPost("signup")]

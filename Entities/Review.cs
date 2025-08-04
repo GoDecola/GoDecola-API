@@ -1,4 +1,6 @@
-﻿namespace GoDecola.API.Entities
+﻿using GoDecola.API.Enums;
+
+namespace GoDecola.API.Entities
 {
     public class Review
     {

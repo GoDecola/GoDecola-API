@@ -81,7 +81,7 @@ builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
-
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddScoped<IPaymentService>(provider =>
 {
