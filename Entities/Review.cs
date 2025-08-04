@@ -7,6 +7,7 @@
         public User User { get; set; }
         public int TravelPackageId { get; set; }
         public TravelPackage TravelPackage { get; set; }
+        public ReviewStatus Status { get; set; }
         public double Rating { get; set; }
         public string? Comment { get; set; }
         public DateTime ReviewDate { get; set; }

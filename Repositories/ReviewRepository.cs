@@ -14,6 +14,30 @@ namespace GoDecola.API.Repositories
             _context = context;
         }
 
+        public async Task<IEnumerable<Review>> GetAllAsync()
+        {
+            return await _context.Reviews
+                .Include(r => r.User) // inclui o usuario que fez a avaliacao
+                .Include(r => r.TravelPackage) // inclui dados do pacote
+                .OrderByDescending(r => r.ReviewDate) // ordena as reviews pela data, da mais recente para a mais antiga
+                .ToListAsync();
+        }
+
+        public async Task<Review?> GetByIdAsync(int id)
+        {
+            return await _context.Reviews
+                .Include(r => r.User) // inclui o usuario que fez a avaliacao
+                .Include(r => r.TravelPackage) // inclui dados do pacote
+                .FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        public async Task<Review> UpdateAsync(Review review)
+        {
+            _context.Reviews.Update(review);
+            await _context.SaveChangesAsync();
+            return review;
+        }
+
         public async Task<Review> AddAsync(Review review)
         {
             await _context.Reviews.AddAsync(review);
