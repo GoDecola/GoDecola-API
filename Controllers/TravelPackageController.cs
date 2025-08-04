@@ -27,48 +27,74 @@ namespace GoDecola.API.Controllers
         }
 
         [HttpGet("filter")]
-        public async Task<ActionResult<IEnumerable<TravelPackageDTO>>> SearchPackages([FromQuery] string? destination, [FromQuery] long? minPrice, [FromQuery] long? maxPrice, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] int? numberGuests)
+        public async Task<ActionResult<IEnumerable<TravelPackageDTO>>> SearchPackages(
+        [FromQuery] string? destination,
+        [FromQuery] long? minPrice,
+        [FromQuery] long? maxPrice,
+        [FromQuery] DateTime? startDate,
+        [FromQuery] DateTime? endDate,
+        [FromQuery] int? numberGuests)
         {
-            var allPackages = await _travelPackageRepository.GetAllAsync();
+            var allPackages = await _travelPackageRepository.GetAllAsync();            
 
-            // giltro por destino busca em 3 campos (TravelPackage.Destination, Address.City, Address.State)
+            // Adicionado Filtro por Title
             if (!string.IsNullOrWhiteSpace(destination))
             {
                 var searchTerm = destination.Trim().ToLower();
                 allPackages = allPackages.Where(p =>
-                    (p.Destination?.ToLower().Contains(searchTerm) == true) ||
+                    (p.Title?.ToLower().Contains(searchTerm) == true) ||
+                    (p.Destination?.ToLower().Contains(searchTerm) == true) ||                    
                     (p.AccommodationDetails?.Address?.City?.ToLower().Contains(searchTerm) == true) ||
                     (p.AccommodationDetails?.Address?.State?.ToLower().Contains(searchTerm) == true)
-                );
+                );                
             }
 
+            // Filtro por número de hóspedes
             if (numberGuests.HasValue)
             {
-                allPackages = allPackages.Where(p => p.NumberGuests >= numberGuests.Value);
+                allPackages = allPackages.Where(p => p.NumberGuests >= numberGuests.Value);                
             }
 
             // filtro por preco (correspondencia exata)
             if (minPrice.HasValue)
             {
-                allPackages = allPackages.Where(p => p.Price >= minPrice.Value);
+                allPackages = allPackages.Where(p => p.Price >= minPrice.Value);              
             }
             if (maxPrice.HasValue)
             {
-                allPackages = allPackages.Where(p => p.Price <= maxPrice.Value);
+                allPackages = allPackages.Where(p => p.Price <= maxPrice.Value);                
             }
 
-            // filtro por data de inicio (pacotes que comecam na data informada ou depois)
-            if (startDate.HasValue)
+            // Filtro por intervalo de datas
+            if (startDate.HasValue && endDate.HasValue)
             {
-                allPackages = allPackages.Where(p => p.StartDate.Date >= startDate.Value.Date);
+                // Garantindo que as datas sejam tratadas como UTC para consistência
+                var startDateUtc = startDate.Value.Date;
+                var endDateUtc = endDate.Value.Date;
+                allPackages = allPackages.Where(p =>
+                    p.StartDate.Date <= startDateUtc &&
+                    p.EndDate.Date >= endDateUtc);                
             }
-            if (endDate.HasValue)
+            else if (startDate.HasValue)
             {
-                allPackages = allPackages.Where(p => p.StartDate.Date <= endDate.Value.Date);
+                var startDateUtc = startDate.Value.Date;
+                allPackages = allPackages.Where(p => p.StartDate.Date <= startDateUtc);                
+            }
+            else if (endDate.HasValue)
+            {
+                var endDateUtc = endDate.Value.Date;
+                allPackages = allPackages.Where(p => p.EndDate.Date >= endDateUtc);               
+            }
+
+            // Log dos pacotes retornados para depuração
+            foreach (var package in allPackages)
+            {
+                Console.WriteLine($"Package ID={package.Id}, StartDate={package.StartDate:yyyy-MM-dd}, EndDate={package.EndDate:yyyy-MM-dd}");
             }
 
             return Ok(_mapper.Map<IEnumerable<TravelPackageDTO>>(allPackages));
         }
+
 
         [HttpPost("{id}/media")]
         [Authorize (Roles = nameof(UserType.ADMIN))]

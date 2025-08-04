@@ -240,6 +240,40 @@ namespace GoDecola.API.Migrations
                     b.ToTable("Reservations");
                 });
 
+            modelBuilder.Entity("GoDecola.API.Entities.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Rating")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("ReviewDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TravelPackageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TravelPackageId");
+
+                    b.HasIndex("UserId", "TravelPackageId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
+                    b.ToTable("Reviews");
+                });
+
             modelBuilder.Entity("GoDecola.API.Entities.TravelPackage", b =>
                 {
                     b.Property<int>("Id")
@@ -333,6 +367,9 @@ namespace GoDecola.API.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -402,6 +439,39 @@ namespace GoDecola.API.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("GoDecola.API.Entities.Wishlist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TravelPackageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("WishlistId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TravelPackageId");
+
+                    b.HasIndex("WishlistId");
+
+                    b.HasIndex("UserId", "TravelPackageId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
+                    b.ToTable("Wishlists");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -592,6 +662,24 @@ namespace GoDecola.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("GoDecola.API.Entities.Review", b =>
+                {
+                    b.HasOne("GoDecola.API.Entities.TravelPackage", "TravelPackage")
+                        .WithMany("Reviews")
+                        .HasForeignKey("TravelPackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GoDecola.API.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("TravelPackage");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("GoDecola.API.Entities.TravelPackageMedia", b =>
                 {
                     b.HasOne("GoDecola.API.Entities.TravelPackage", "TravelPackage")
@@ -601,6 +689,28 @@ namespace GoDecola.API.Migrations
                         .IsRequired();
 
                     b.Navigation("TravelPackage");
+                });
+
+            modelBuilder.Entity("GoDecola.API.Entities.Wishlist", b =>
+                {
+                    b.HasOne("GoDecola.API.Entities.TravelPackage", "TravelPackage")
+                        .WithMany()
+                        .HasForeignKey("TravelPackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GoDecola.API.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GoDecola.API.Entities.Wishlist", null)
+                        .WithMany("Items")
+                        .HasForeignKey("WishlistId");
+
+                    b.Navigation("TravelPackage");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -665,6 +775,13 @@ namespace GoDecola.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Medias");
+
+                    b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("GoDecola.API.Entities.Wishlist", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }
