@@ -28,6 +28,18 @@ namespace GoDecola.API.Controllers
             _userManager = userManager;
         }
 
+        [HttpGet("admin/reviews")]
+        [Authorize(Roles = nameof(UserType.ADMIN))]
+        public async Task<ActionResult<IEnumerable<ReviewDTO>>> GetAllReviews()
+        {
+            var reviews = await _reviewRepository.GetAllAsync();
+            if (reviews == null || !reviews.Any())
+            {
+                return Ok(new List<ReviewDTO>()); // retorna lista vazia se nao houver reviews
+            }
+            return Ok(_mapper.Map<IEnumerable<ReviewDTO>>(reviews));
+        }
+
         [HttpGet("travel-packages/{packageId}/reviews")]
         public async Task<ActionResult<IEnumerable<ReviewDTO>>> GetReviewsByPackage(int packageId)
         {
