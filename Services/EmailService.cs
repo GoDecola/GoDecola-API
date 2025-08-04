@@ -32,8 +32,20 @@ namespace GoDecola.API.Services
             };
 
             using var smtp = new SmtpClient();
-            await smtp.ConnectAsync(_config["EmailSettings:SmptServer"], int.Parse(_config["EmailSettings:Port"]), SecureSocketOptions.StartTls);
-            await smtp.AuthenticateAsync(_config["EmailSettings:Username"], _config["EmailSettings:Password"]);
+            int port = int.Parse(_config["EmailSettings:Port"]);
+
+            if (_config["EmailSettings:SmtpServer"] == "localhost")
+            {
+                // conecta sem seguranca para o smtp4dev
+                await smtp.ConnectAsync(_config["EmailSettings:SmtpServer"], port, SecureSocketOptions.None);
+            }
+            else
+            {
+                // conecta com TlS para servidores de producao
+                await smtp.ConnectAsync(_config["EmailSettings:SmtpServer"], port, SecureSocketOptions.StartTls);
+                await smtp.AuthenticateAsync(_config["EmailSettings:Username"], _config["EmailSettings:Password"]);
+            }
+
             await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);
         }

@@ -36,7 +36,7 @@ namespace GoDecola.API.Controllers
             _config = config;
         }
 
-        [HttpGet("forgot-password")]
+        [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDTO forgotPassword)
         {
             var user = await _userManager.FindByEmailAsync(forgotPassword.Email);
@@ -52,7 +52,7 @@ namespace GoDecola.API.Controllers
             // codifica o token pra ser usado na URL
             var encodedToken = System.Net.WebUtility.UrlEncode(token);
 
-            var resetUrlBase = _config["AppSettings:ResetPasswordUrlBase"];
+            var resetUrlBase = _config["FrontendSettings:ResetPasswordUrl"];
             if (string.IsNullOrEmpty(resetUrlBase))
             {
                 return StatusCode(500, "A URL de redefinição de senha não está configurada no servidor");
