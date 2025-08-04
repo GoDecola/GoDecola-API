@@ -72,15 +72,16 @@ namespace GoDecola.API.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDTO resetPassword)
         {
+            
             var user = await _userManager.FindByEmailAsync(resetPassword.Email);
             if (user == null)
             {
                 return BadRequest("Link de redefinição inválido ou expirado");
             }
 
-            var decodedToken = System.Net.WebUtility.UrlDecode(resetPassword.Token);
+            //var decodedToken = System.Net.WebUtility.UrlDecode(resetPassword.Token);
 
-            var result = await _userManager.ResetPasswordAsync(user, decodedToken, resetPassword.NewPassword);
+            var result = await _userManager.ResetPasswordAsync(user, resetPassword.Token/*decodedToken*/, resetPassword.NewPassword);
 
             if (!result.Succeeded)
             {
