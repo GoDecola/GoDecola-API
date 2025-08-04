@@ -162,7 +162,7 @@ config:
   theme: base
   layout: elk
 ---
-graph TD
+graph LR
 
 subgraph Cliente
     A[Browser]
