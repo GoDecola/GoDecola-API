@@ -28,6 +28,23 @@ namespace GoDecola.API.Controllers
             _userManager = userManager;
         }
 
+        [HttpPatch("admin/reviews/{reviewId}/status")]
+        [Authorize(Roles = nameof(UserType.ADMIN))]
+        public async Task<IActionResult> UpdateReviewStatus(int reviewId, StatusReviewDTO statusReview)
+        {
+            var review = await _reviewRepository.GetByIdAsync(reviewId);
+            if (review == null)
+            {
+                return NotFound($"Review {reviewId} não encontrada");
+            }
+
+            review.Status = statusReview.Status.ToString();
+
+            await _reviewRepository.UpdateAsync(review);
+
+            return NoContent();
+        }
+
         [HttpGet("admin/reviews")]
         [Authorize(Roles = nameof(UserType.ADMIN))]
         public async Task<ActionResult<IEnumerable<ReviewDTO>>> GetAllReviews()
@@ -83,6 +100,7 @@ namespace GoDecola.API.Controllers
             var review = _mapper.Map<Review>(createReview);
             review.UserId = userId;
             review.ReviewDate = DateTime.UtcNow;
+            review.Status = ReviewStatus.PENDING.ToString();
 
             var newReview = await _reviewRepository.AddAsync(review);
             var reviewDto = _mapper.Map<ReviewDTO>(newReview);

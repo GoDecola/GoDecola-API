@@ -5,6 +5,9 @@ namespace GoDecola.API.Repositories
 {
     public interface IReviewRepository
     {
+        Task<IEnumerable<Review>> GetAllAsync();
+        Task<Review> GetByIdAsync(int id);
+        Task<Review> UpdateAsync(Review review);
         Task<Review> AddAsync(Review review);
         Task<IEnumerable<Review>> GetByPackageIdAsync(int travelPackageId);
         Task<IEnumerable<Review>> GetByUserIdAsync(string userId);
