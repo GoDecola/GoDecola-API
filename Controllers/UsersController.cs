@@ -188,8 +188,8 @@ namespace GoDecola.API.Controllers
             }
 
             // atualiza dados permitidos 
-            usuario.FirstName = dados.FirstName;
-            usuario.LastName = dados.LastName;
+            usuario.FirstName = dados!.FirstName!;
+            usuario.LastName = dados!.LastName!;
             usuario.Email = dados.Email;
             usuario.UserName = dados.Email;
 
