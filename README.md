@@ -208,7 +208,6 @@ C --> I
 - Integração de pagamento Stripe
 - Git para versionamento
 - Swagger
-- **_OUTROS etc etc etc_**
 
 ## Instruções de uso
 
@@ -225,40 +224,6 @@ cd GoDecola-API
 dotnet run
 ```
 > 💡 Configure as chaves no **appsettings.json** para conexão com o banco de dados e API de pagamento.
-
-## Contribuidores
-
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/EvelynCunha">
-        <img src="https://github.com/EvelynCunha.png" width="100px">
-        <br>
-        <sub>
-          <b>Evelyn</b>
-        </sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/GabrielQuinteiro">
-        <img src="https://github.com/GabrielQuinteiro.png" width="100px">
-        <br>
-        <sub>
-          <b>Gabriel</b>
-        </sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/lettymoon">
-        <img src="https://github.com/lettymoon.png" width="100px">
-        <br>
-        <sub>
-          <b>Letícia</b>
-        </sub>
-      </a>
-    </td>
-  </tr>
-</table>
 
 ## Licença
 Este projeto está licenciado sob a [Licença MIT](LICENSE).
