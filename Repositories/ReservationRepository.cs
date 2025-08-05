@@ -35,8 +35,8 @@ namespace GoDecola.API.Repositories
             return await _context.Reservations
                 .Include(r => r.User) // inclui o usuário relacionado
                 .Include(r => r.TravelPackage) // inclui o pacote de viagem relacionado
-                .Include(r => r.TravelPackage.Medias) // inclui as mídias do pacote de viagem
-                .Include(r => r.TravelPackage.AccommodationDetails) // inclui os detalhes de acomodação do pacote
+                .Include(r => r.TravelPackage!.Medias) // inclui as mídias do pacote de viagem
+                .Include(r => r.TravelPackage!.AccommodationDetails) // inclui os detalhes de acomodação do pacote
                     .ThenInclude(ad => ad.Address) // inclui o endereço relacionado aos detalhes de acomodação
                 .Include(r => r.Guests) // inclui os hóspedes relacionados
                 .FirstOrDefaultAsync(r => r.Id == id); // busca pela Id
@@ -68,8 +68,8 @@ namespace GoDecola.API.Repositories
             var reservations = await _context.Reservations
                 .Include(r => r.User)
                 .Include(r => r.TravelPackage)
-                .Include(r => r.TravelPackage.Medias) // inclui as mídias do pacote de viagem
-                .Include(r => r.TravelPackage.AccommodationDetails) // inclui os detalhes de acomodação do pacote
+                .Include(r => r.TravelPackage!.Medias) // inclui as mídias do pacote de viagem
+                .Include(r => r.TravelPackage!.AccommodationDetails) // inclui os detalhes de acomodação do pacote
                     .ThenInclude(ad => ad.Address) // inclui o endereço relacionado aos detalhes de acomodação
                 .Include(r => r.Guests)
                 .Where(r => r.UserId == userId)

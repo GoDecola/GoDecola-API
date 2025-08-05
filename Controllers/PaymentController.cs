@@ -40,6 +40,22 @@ namespace GoDecola.API.Controllers
             }
         }
 
+        [HttpPost("pix")]
+        [Authorize]
+        public async Task<IActionResult> CreatePixPayment([FromBody] PaymentRequestDTO request)
+        {
+            var response = await _paymentService.CreatePixPaymentAsync(request);
+            return Ok(response);
+        }
+
+        [HttpPost("boleto")]
+        [Authorize]
+        public async Task<IActionResult> CreateBoletoPayment([FromBody] PaymentRequestDTO request)
+        {
+            var response = await _paymentService.CreateBoletoPaymentAsync(request);
+            return Ok(response);
+        }
+
         [Authorize(Roles = "ADMIN,SUPPORT")]
         [HttpGet("admin/list")]
         public async Task<IActionResult> GetAllPayments()
@@ -58,6 +74,15 @@ namespace GoDecola.API.Controllers
 
             return Ok(response);
         }
+
+        [HttpPatch("{paymentId}/status")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> UpdatePaymentStatus(int paymentId, [FromBody] string newStatus)
+        {
+            await _paymentService.UpdatePaymentStatusAsync(paymentId, newStatus);
+            return NoContent();
+        }
+
 
     }
 }

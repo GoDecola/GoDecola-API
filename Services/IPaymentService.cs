@@ -11,6 +11,9 @@ namespace GoDecola.API.Services
         Task HandleStripeWebhookAsync(Event stripeEvent);
         Task<IEnumerable<PaymentResponseDTO>> GetAllPaymentsAsync();
         Task<PaymentResponseDTO?> GetPaymentByIdAsync(int id);
+        Task<PaymentResponseDTO> CreatePixPaymentAsync(PaymentRequestDTO request);
+        Task<PaymentResponseDTO> CreateBoletoPaymentAsync(PaymentRequestDTO request);
+        Task UpdatePaymentStatusAsync(int paymentId, string newStatus);
 
     }
 }

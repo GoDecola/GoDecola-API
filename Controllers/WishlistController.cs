@@ -41,7 +41,7 @@ namespace GoDecola.API.Controllers
                 return NotFound("Pacote de viagem não encontrado.");
 
             // verifica se o pacote ja está na wishlist do usuario
-            var existing = await _wishlistRepo.GetByUserAndPackageAsync(userId, addWishlist.TravelPackageId);
+            var existing = await _wishlistRepo.GetByUserAndPackageAsync(userId!, addWishlist.TravelPackageId);
             if (existing != null)
                 return Conflict("Este pacote já está na sua wishlist.");
 
@@ -65,7 +65,7 @@ namespace GoDecola.API.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // busca todos os itens da wishlist do usuario
-            var items = await _wishlistRepo.GetAllByUserAsync(userId);
+            var items = await _wishlistRepo.GetAllByUserAsync(userId!);
 
             // mapeia os itens para a dto 
             var result = items.Select(item => new WishlistItemDTO
@@ -88,7 +88,7 @@ namespace GoDecola.API.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // busca o item da wishlist pelo id do usuario e do pacote de viagem
-            var item = await _wishlistRepo.GetByUserAndPackageAsync(userId, travelPackageId);
+            var item = await _wishlistRepo.GetByUserAndPackageAsync(userId!, travelPackageId);
             if (item == null)
                 return NotFound("Item da wishlist não encontrado.");
 

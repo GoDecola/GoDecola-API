@@ -61,7 +61,7 @@ namespace GoDecola.API.Controllers
             var resetUrl = $"{resetUrlBase}?token={encodedToken}&email={user.Email}";
 
             await _emailService.SendForgotPasswordEmailAsync(
-                user.Email,
+                user!.Email!,
                 user.FirstName,
                 resetUrl
             );
@@ -139,7 +139,7 @@ namespace GoDecola.API.Controllers
 
             // Passaporte 
             bool passaportInformado = !string.IsNullOrWhiteSpace(register.Passaport);
-            bool passaportValido = !passaportInformado || ValidationUtils.IsValidPassport(register.Passaport);
+            bool passaportValido = !passaportInformado || ValidationUtils.IsValidPassport(register!.Passaport!);
 
             // se passaporte for informado e não for válido, retorna erro
             if (passaportInformado && !passaportValido)
