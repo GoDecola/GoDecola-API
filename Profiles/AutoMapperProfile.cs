@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
-using GoDecola.API.Entities;
 using GoDecola.API.DTOs;
-using GoDecola.API.DTOs.UserDTOs;
-using GoDecola.API.DTOs.TravelPackageDTOs;
-using GoDecola.API.DTOs.ReservationDTOs;
 using GoDecola.API.DTOs.PaymentDTOs;
+using GoDecola.API.DTOs.ReservationDTOs;
+using GoDecola.API.DTOs.ReviewDTOs;
+using GoDecola.API.DTOs.TravelPackageDTOs;
+using GoDecola.API.DTOs.UserDTOs;
+using GoDecola.API.Entities;
 
 namespace GoDecola.API.Profiles
 {
@@ -70,7 +71,11 @@ namespace GoDecola.API.Profiles
                 .ForMember(dest => dest.RedirectUrl, opt => opt.MapFrom(src => src.RedirectUrl))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status)) 
                 .ForMember(dest => dest.AmountPaid, opt => opt.MapFrom(src => src.AmountPaid)) 
-                .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate)); 
+                .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate));
+
+            // ----------------------- REVIEW --------------------------------
+            CreateMap<Review, ReviewDTO>();
+            CreateMap<User, ReviewUserDTO>();
         }
     }
 }
