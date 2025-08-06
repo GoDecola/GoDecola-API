@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GoDecola.API.Controllers
 {
@@ -172,20 +173,33 @@ namespace GoDecola.API.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = nameof(UserType.ADMIN))]
-        public async Task<IActionResult> Update(int id, UpdateTravelPackageDTO travelPackage)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateTravelPackageDTO travelPackage)
         {
-            var existingTravelPackage = await _travelPackageRepository.GetByIdAsync(id);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            var existingTravelPackage = await _travelPackageRepository.GetByIdAsync(id);
             if (existingTravelPackage == null)
             {
                 return NotFound("Pacote de viagem não encontrado.");
             }
 
-            var updatedTravelPackage = _mapper.Map(travelPackage, existingTravelPackage);
-
-            await _travelPackageRepository.UpdateAsync(updatedTravelPackage);
-
-            return NoContent();
+            try
+            {
+                var updatedTravelPackage = _mapper.Map(travelPackage, existingTravelPackage);
+                await _travelPackageRepository.UpdateAsync(updatedTravelPackage);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, $"Erro ao atualizar pacote: {ex.InnerException?.Message ?? ex.Message}");
+            }
         }
 
         [HttpDelete("{id}")]

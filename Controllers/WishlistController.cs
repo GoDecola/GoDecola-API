@@ -41,7 +41,7 @@ namespace GoDecola.API.Controllers
                 return NotFound("Pacote de viagem não encontrado.");
 
             // verifica se o pacote ja está na wishlist do usuario
-            var existing = await _wishlistRepo.GetByUserAndPackageAsync(userId, addWishlist.TravelPackageId);
+            var existing = await _wishlistRepo.GetByUserAndPackageAsync(userId!, addWishlist.TravelPackageId);
             if (existing != null)
                 return Conflict("Este pacote já está na sua wishlist.");
 
@@ -55,7 +55,16 @@ namespace GoDecola.API.Controllers
 
             // salva e retorna 200 ok
             await _wishlistRepo.AddAsync(wishlistItem);
-            return Ok("Pacote adicionado à wishlist com sucesso.");
+            var result = new WishlistItemDTO
+            {
+                Id = wishlistItem.Id,
+                TravelPackageId = wishlistItem.TravelPackageId,
+                Title = travelPackage.Title,
+                Description = travelPackage.Description,
+                IsAvailable = travelPackage.IsActive,
+                AddedDate = wishlistItem.AddedDate
+            };
+            return Ok(result);
         }
 
         [HttpGet]
@@ -65,11 +74,12 @@ namespace GoDecola.API.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // busca todos os itens da wishlist do usuario
-            var items = await _wishlistRepo.GetAllByUserAsync(userId);
+            var items = await _wishlistRepo.GetAllByUserAsync(userId!);
 
             // mapeia os itens para a dto 
             var result = items.Select(item => new WishlistItemDTO
             {
+                Id = item.Id,
                 TravelPackageId = item.TravelPackageId,
                 Title = item.TravelPackage?.Title ?? "Indisponível", // se o pacote nao existir, retorna "Indisponível"
                 Description = item.TravelPackage?.Description,
@@ -81,18 +91,18 @@ namespace GoDecola.API.Controllers
         }
         // TODO: DEBATER SE APEAS O USUARIO PODE REMOVER DA WISHLIST OU O ADMINISTRADOR TAMBEM PODE
         [Authorize(Roles = nameof(UserType.USER))]
-        [HttpDelete("{travelPackageId}")]
-        public async Task<IActionResult> RemoveFromWishlist(int travelPackageId)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> RemoveFromWishlist(int id)
         {
             // autenticador jwt para remover um pacote de viagem da wishlist do usuario logado
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // busca o item da wishlist pelo id do usuario e do pacote de viagem
-            var item = await _wishlistRepo.GetByUserAndPackageAsync(userId, travelPackageId);
-            if (item == null)
+            var item = await _wishlistRepo.GetByIdAsync(id);
+            if (item == null || item.UserId != userId)
                 return NotFound("Item da wishlist não encontrado.");
 
-            await _wishlistRepo.DeleteAsync(item.Id);
+            await _wishlistRepo.DeleteAsync(id);
             return Ok("Item removido da wishlist.");
         }
     }

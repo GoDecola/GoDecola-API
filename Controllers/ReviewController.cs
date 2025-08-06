@@ -92,7 +92,7 @@ namespace GoDecola.API.Controllers
                 return Forbid("Apenas usuários que reservaram este pacote podem avaliá-lo.");
             }
 
-            if (reservation.TravelPackage.EndDate > DateTime.UtcNow)
+            if (reservation?.TravelPackage?.EndDate > DateTime.UtcNow)
             {
                 return Forbid("Você só pode avaliar a viagem após a data de término.");
             }

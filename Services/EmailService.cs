@@ -49,5 +49,55 @@ namespace GoDecola.API.Services
             await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);
         }
+
+        public async Task SendEmailAsync(string to, string subject, string htmlContent)
+        {
+            var email = new MimeMessage();
+            email.From.Add(MailboxAddress.Parse(_config["EmailSettings:From"]));
+            email.To.Add(MailboxAddress.Parse(to));
+            email.Subject = subject;
+            email.Body = new TextPart(TextFormat.Html)
+            {
+                Text = htmlContent
+            };
+
+            using var smtp = new SmtpClient();
+            int port = int.Parse(_config["EmailSettings:Port"]);
+
+            if (_config["EmailSettings:SmtpServer"] == "localhost")
+            {
+               
+                await smtp.ConnectAsync(_config["EmailSettings:SmtpServer"], port, SecureSocketOptions.None);
+            }
+            else
+            {
+                
+                await smtp.ConnectAsync(_config["EmailSettings:SmtpServer"], port, SecureSocketOptions.StartTls);
+                await smtp.AuthenticateAsync(_config["EmailSettings:Username"], _config["EmailSettings:Password"]);
+            }
+
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
+        }
+
+        public async Task SendPaymentVoucherAsync(string to, string guestName, string voucherUrl, long? amountPaid)
+        {
+            var subject = "Comprovante de Pagamento - GoDecola";
+            var htmlContent = $@"
+            <html>
+                <body>
+                    <h2>Olá {guestName},</h2>
+                    <p>Seu pagamento de <strong>R$ {amountPaid / 100.0:F2}</strong> foi confirmado!</p>
+                    <p>Você pode acessar seu comprovante clicando no link abaixo:</p>
+                    <a href='{voucherUrl}'>Ver Comprovante</a>
+                    <br/><br/>
+                    <p>Obrigado por viajar com a GoDecola!</p>
+                </body>
+            </html>";
+
+            await SendEmailAsync(to, subject, htmlContent);
+        }
     }
+
 }
+

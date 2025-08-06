@@ -48,7 +48,7 @@ namespace GoDecola.API.Controllers
 
             // mapear DTO para entidade Reservation
             var reservation = _mapper.Map<Reservation>(createReservation);
-            reservation.Status = ReservationStatus.CONFIRMED;
+            reservation.Status = ReservationStatus.PENDING;
             reservation.TotalPrice = travelPackage.Price;
 
             await _reservationRepository.AddAsync(reservation);

@@ -7,6 +7,7 @@ using GoDecola.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Stripe;
@@ -88,6 +89,7 @@ builder.Services.AddScoped<IPaymentService>(provider =>
     var reservationRepo = provider.GetRequiredService<IRepository<Reservation, int>>();
     var paymentRepo = provider.GetRequiredService<IRepository<Payment, int>>();
     var logger = provider.GetRequiredService<ILogger<WebhookController>>(); // Logger para registrar eventos do Stripe, remover dps
+    var emailService = provider.GetRequiredService<IEmailService>();
 
     var stripeConfig = builder.Configuration.GetSection("Stripe");
     var stripeSettings = new StripeSettings
@@ -105,6 +107,7 @@ builder.Services.AddScoped<IPaymentService>(provider =>
         paymentRepo,
         stripeSettings,
         logger, //remover dps
+        emailService,
         successUrl,
         cancelUrl
     );

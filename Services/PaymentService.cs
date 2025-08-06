@@ -13,6 +13,7 @@ namespace GoDecola.API.Services
     {
         private readonly IRepository<Reservation, int> _reservationRepository;
         private readonly IRepository<Payment, int> _paymentRepository;
+        private readonly IEmailService _emailService;
         private readonly StripeSettings _stripeSettings;
         private readonly ILogger<WebhookController> _logger;
         private readonly string _successUrl;
@@ -23,11 +24,13 @@ namespace GoDecola.API.Services
             IRepository<Payment, int> paymentRepository,
             StripeSettings stripeSettings,
             ILogger<WebhookController> logger,
+            IEmailService emailService,
             string successUrl,
             string cancelUrl)
         {
             _reservationRepository = reservationRepository;
             _paymentRepository = paymentRepository;
+            _emailService = emailService;
             _stripeSettings = stripeSettings;
             _successUrl = successUrl;
             _cancelUrl = cancelUrl;
@@ -54,7 +57,6 @@ namespace GoDecola.API.Services
             await _paymentRepository.AddAsync(payment);
 
             var guestEmail = reservation.Guests?.FirstOrDefault()?.Email;
-            _logger.LogInformation($"Email do hóspede enviado para Stripe: {guestEmail}");
 
             var options = new SessionCreateOptions
             {
@@ -94,9 +96,16 @@ namespace GoDecola.API.Services
                 payment.RedirectUrl = session.Url;
                 payment.StripePaymentIntentId = session.PaymentIntentId;
 
+                payment.Status = PaymentStatus.CONFIRMED.ToString();
                 await _paymentRepository.UpdateAsync(payment);
+
+                reservation.Status = ReservationStatus.CONFIRMED;
+                await _reservationRepository.UpdateAsync(reservation);
+
                 return new PaymentResponseDTO
                 {
+                    Id = payment.Id,
+                    ReservationId = payment.ReservationId,
                     RedirectUrl = session.Url,
                     Status = payment.Status,
                     AmountPaid = payment.AmountPaid,
@@ -111,6 +120,69 @@ namespace GoDecola.API.Services
             }
         }
 
+        public async Task<PaymentResponseDTO> CreatePixPaymentAsync(PaymentRequestDTO request)
+        {
+            var reservation = await _reservationRepository.GetByIdAsync(request.ReservationId);
+            if (reservation == null)
+                throw new Exception("Reserva não encontrada.");
+
+            var pixCode = $"PIX-{Guid.NewGuid().ToString().Substring(0, 8)}";
+
+            var payment = new Payment
+            {
+                ReservationId = request.ReservationId,
+                AmountPaid = reservation.TotalPrice,
+                Method = "PIX",
+                PixQrCode = pixCode,
+                Status = PaymentStatus.PENDING.ToString(),
+                PaymentDate = DateTime.UtcNow
+            };
+
+            await _paymentRepository.AddAsync(payment);
+
+            return new PaymentResponseDTO
+            {
+                Id = payment.Id,
+                ReservationId = payment.ReservationId,
+                Status = payment.Status,
+                AmountPaid = payment.AmountPaid,
+                PaymentDate = payment.PaymentDate,
+                RedirectUrl = payment.PixQrCode,
+                ReservationStatus = reservation.Status.ToString()
+            };
+        }
+
+        public async Task<PaymentResponseDTO> CreateBoletoPaymentAsync(PaymentRequestDTO request)
+        {
+            var reservation = await _reservationRepository.GetByIdAsync(request.ReservationId);
+            if (reservation == null)
+                throw new Exception("Reserva não encontrada.");
+
+            var barcode = $"23790{new Random().Next(10000000, 99999999)}";
+
+            var payment = new Payment
+            {
+                ReservationId = request.ReservationId,
+                AmountPaid = reservation.TotalPrice,
+                Method = "Boleto",
+                BoletoBarcode = barcode,
+                Status = PaymentStatus.PENDING.ToString(),
+                PaymentDate = DateTime.UtcNow
+            };
+
+            await _paymentRepository.AddAsync(payment);
+
+            return new PaymentResponseDTO
+            {
+                Id = payment.Id,
+                ReservationId = payment.ReservationId,
+                Status = payment.Status,
+                AmountPaid = payment.AmountPaid,
+                PaymentDate = payment.PaymentDate,
+                RedirectUrl = payment.BoletoBarcode,
+                ReservationStatus = reservation.Status.ToString()
+            };
+        }
         public async Task<IEnumerable<PaymentResponseDTO>> GetAllPaymentsAsync()
         {
             var payments = await _paymentRepository.GetAllAsync();
@@ -175,9 +247,6 @@ namespace GoDecola.API.Services
                 return;
             }
 
-
-            _logger.LogInformation($"Metadata recebido: {JsonConvert.SerializeObject(session.Metadata)}");
-
             Payment? payment = null;
 
             if (session.Metadata.TryGetValue("payment_id", out var paymentIdStr) &&
@@ -199,7 +268,7 @@ namespace GoDecola.API.Services
                 _logger.LogWarning("Nenhum pagamento encontrado para atualizar.");
                 return;
             }
-            
+
             payment.Status = PaymentStatus.CONFIRMED.ToString();
 
             var chargeService = new ChargeService();
@@ -216,8 +285,19 @@ namespace GoDecola.API.Services
             }
 
             await _paymentRepository.UpdateAsync(payment);
-
             var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
+            var guest = reservation!.Guests!.FirstOrDefault();
+
+            if (guest != null)
+            {
+                await _emailService.SendPaymentVoucherAsync(
+                    guest.Email,
+                    guest.FirstName,
+                    payment.UrlVoucher,
+                    payment.AmountPaid
+                );
+            }
+
             if (reservation != null && reservation.Status == ReservationStatus.PENDING)
             {
                 reservation.Status = ReservationStatus.CONFIRMED;
@@ -249,14 +329,14 @@ namespace GoDecola.API.Services
 
             payment.Status = PaymentStatus.CONFIRMED.ToString();
             await _paymentRepository.UpdateAsync(payment);
-           
+
 
             var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
             if (reservation != null && reservation.Status == ReservationStatus.PENDING)
             {
                 reservation.Status = ReservationStatus.CONFIRMED;
                 await _reservationRepository.UpdateAsync(reservation);
-                
+
             }
         }
 
@@ -283,14 +363,14 @@ namespace GoDecola.API.Services
 
             payment.Status = PaymentStatus.FAILED.ToString();
             await _paymentRepository.UpdateAsync(payment);
-            
+
 
             var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
             if (reservation != null)
             {
                 reservation.Status = ReservationStatus.CANCELLED;
                 await _reservationRepository.UpdateAsync(reservation);
-                
+
             }
         }
 
@@ -325,7 +405,61 @@ namespace GoDecola.API.Services
                 await _reservationRepository.UpdateAsync(reservation);
             }
         }
-        
+        public async Task UpdatePaymentStatusAsync(int paymentId, string newStatus) // pro admin alterar manualmente
+        {
+            var payment = await _paymentRepository.GetByIdAsync(paymentId);
+            if (payment == null) throw new Exception("Pagamento não encontrado.");
+
+            payment.Status = newStatus;
+
+            if (newStatus == PaymentStatus.CONFIRMED.ToString() &&
+                (payment.Method == "PIX" || payment.Method == "Boleto"))
+            {
+                payment.UrlVoucher = $"https://godecola.com/voucher/{payment.Id}"; //envio comprovante apenas quando pix e boleto
+                await _paymentRepository.UpdateAsync(payment);
+
+                var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
+                if (reservation != null && reservation.Status == ReservationStatus.PENDING)
+                {
+                    reservation.Status = ReservationStatus.CONFIRMED;
+                    await _reservationRepository.UpdateAsync(reservation);
+                }
+
+                var guest = reservation!.Guests!.FirstOrDefault();
+                if (guest != null)
+                {
+                    await _emailService.SendPaymentVoucherAsync(
+                        guest.Email,
+                        guest.FirstName,
+                        payment.UrlVoucher,
+                        payment.AmountPaid
+                    );
+                }
+                return;
+            }
+            else if (newStatus == PaymentStatus.CANCELLED.ToString()) //para pagamentos cancelados
+            {
+                await _paymentRepository.UpdateAsync(payment);
+
+                var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
+                if (reservation != null)
+                {
+                    reservation.Status = ReservationStatus.CANCELLED;
+                    await _reservationRepository.UpdateAsync(reservation);
+                }
+                return;
+            }
+            else if (newStatus == PaymentStatus.FAILED.ToString()) // pagamentos que deram falhas (mas pode tentar pagar com outro metodo
+            {
+                // Só atualiza o pagamento, reserva fica pendente
+                await _paymentRepository.UpdateAsync(payment);
+                return;
+            }
+
+            await _paymentRepository.UpdateAsync(payment);
+        }
+
+
+
     }
 }
-

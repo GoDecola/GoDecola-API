@@ -1,5 +1,6 @@
 ﻿using GoDecola.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Stripe;
 
 namespace GoDecola.API.Controllers
@@ -26,7 +27,7 @@ namespace GoDecola.API.Controllers
         public async Task<IActionResult> StripeWebhook()
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-
+            
             try
             {
                 var webhookSecret = _configuration["Stripe:WebhookSecret"];
@@ -40,9 +41,9 @@ namespace GoDecola.API.Controllers
                     json,
                     Request.Headers["Stripe-Signature"],
                     webhookSecret
-                );
-                //apagar dps, apenas para testes
-                _logger.LogInformation($"Evento Stripe recebido: {stripeEvent.Type}");
+                );   
+
+                _logger.LogInformation("Webhook recebido (teste). Corpo: {Json}", json); // PARA TESTES
 
                 await _paymentService.HandleStripeWebhookAsync(stripeEvent);
                 

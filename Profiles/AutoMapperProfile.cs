@@ -68,14 +68,19 @@ namespace GoDecola.API.Profiles
             CreateMap<PaymentRequestDTO, Payment>();
 
             CreateMap<Payment, PaymentResponseDTO>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.RedirectUrl, opt => opt.MapFrom(src => src.RedirectUrl))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status)) 
                 .ForMember(dest => dest.AmountPaid, opt => opt.MapFrom(src => src.AmountPaid)) 
-                .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate));
+                .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate))
+                .ForMember(dest => dest.ReservationStatus, opt => opt.MapFrom(src => src.Reservation!.Status.ToString()))
+                .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId));
 
             // ----------------------- REVIEW --------------------------------
+            
             CreateMap<Review, ReviewDTO>();
             CreateMap<User, ReviewUserDTO>();
+
         }
     }
 }
