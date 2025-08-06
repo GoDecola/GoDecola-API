@@ -2,6 +2,7 @@
 {
     public class WishlistItemDTO
     {
+        public int Id { get; set; } // Wishlist item ID
         public int TravelPackageId { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
