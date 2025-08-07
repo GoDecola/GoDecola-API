@@ -108,6 +108,31 @@ namespace GoDecola.API.Controllers
             return CreatedAtAction(nameof(GetReviewsByPackage), new { packageId = newReview.TravelPackageId }, reviewDto);
         }
 
+        [HttpPut("{reviewId}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateReview(int reviewId, UpdateReviewDTO updateReviewDto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var review = await _reviewRepository.GetByIdAsync(reviewId);
+
+            if (review == null)
+            {
+                return NotFound("Avaliação não encontrada.");
+            }
+
+            if (review.UserId != userId)
+            {
+                return Forbid("Você não tem permissão para editar esta avaliação.");
+            }
+
+            review.IsEdited = true;
+
+            _mapper.Map(updateReviewDto, review);
+            await _reviewRepository.UpdateAsync(review);
+
+            return Ok(_mapper.Map<ReviewDTO>(review));
+        }
+
         [HttpGet("users/me/reviews")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<ReviewDTO>>> GetMyReviews()
@@ -120,6 +145,30 @@ namespace GoDecola.API.Controllers
 
             var reviews = await _reviewRepository.GetByUserIdAsync(userId);
             return Ok(_mapper.Map<IEnumerable<ReviewDTO>>(reviews));
+        }
+
+        [HttpDelete("{reviewId}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteReview(int reviewId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isAdmin = User.IsInRole(nameof(UserType.ADMIN));
+            var review = await _reviewRepository.GetByIdAsync(reviewId);
+
+            if (review == null)
+            {
+                return NotFound("Avaliação não encontrada.");
+            }
+
+            // o dono da review ou um admin podem deletar
+            if (review.UserId != userId && !isAdmin)
+            {
+                return Forbid("Você não tem permissão para deletar esta avaliação.");
+            }
+
+            await _reviewRepository.DeleteAsync(reviewId);
+
+            return NoContent();
         }
     }
 }

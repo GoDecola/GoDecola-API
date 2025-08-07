@@ -76,11 +76,11 @@ namespace GoDecola.API.Profiles
                 .ForMember(dest => dest.ReservationStatus, opt => opt.MapFrom(src => src.Reservation!.Status.ToString()))
                 .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId));
 
-            // ----------------------- REVIEW --------------------------------
-            
+            // ---------------------- REVIEWS --------------------------------
+
             CreateMap<Review, ReviewDTO>();
             CreateMap<User, ReviewUserDTO>();
-
+            CreateMap<UpdateReviewDTO, Review>();
         }
     }
 }

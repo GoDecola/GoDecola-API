@@ -10,5 +10,6 @@ namespace GoDecola.API.DTOs.ReviewDTOs
         public ReviewStatus Status { get; set; }
         public DateTime ReviewDate { get; set; }
         public ReviewUserDTO? User { get; set; }
+        public bool IsEdited { get; set; }
     }
 }
