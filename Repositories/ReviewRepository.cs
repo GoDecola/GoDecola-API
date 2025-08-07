@@ -45,6 +45,16 @@ namespace GoDecola.API.Repositories
             return review;
         }
 
+        public async Task DeleteAsync(int id)
+        {
+            var reviewToDelete = await _context.Reviews.FindAsync(id);
+            if (reviewToDelete != null)
+            {
+                _context.Reviews.Remove(reviewToDelete);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<IEnumerable<Review>> GetByPackageIdAsync(int travelPackageId)
         {
             return await _context.Reviews

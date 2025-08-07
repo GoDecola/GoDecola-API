@@ -9,6 +9,7 @@ namespace GoDecola.API.Repositories
         Task<Review> GetByIdAsync(int id);
         Task<Review> UpdateAsync(Review review);
         Task<Review> AddAsync(Review review);
+        Task DeleteAsync(int id);
         Task<IEnumerable<Review>> GetByPackageIdAsync(int travelPackageId);
         Task<IEnumerable<Review>> GetByUserIdAsync(string userId);
         Task<Review?> FindOneAsync(Expression<Func<Review, bool>> predicate);
