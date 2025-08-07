@@ -187,7 +187,7 @@ using (var scope = app.Services.CreateScope())
         var userManager = services.GetRequiredService<UserManager<User>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-        await SeedData.Initialize(context, userManager, roleManager);
+        SeedData.Initialize(context, userManager, roleManager).GetAwaiter().GetResult();
     }
     catch (Exception ex)
     {

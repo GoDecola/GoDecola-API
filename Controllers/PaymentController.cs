@@ -31,7 +31,32 @@ namespace GoDecola.API.Controllers
 
             try
             {
-                var response = await _paymentService.InitiateStripeCheckout(request);
+                PaymentResponseDTO response;
+
+                switch (request.Method.ToLower())
+                {
+                    case "pix":
+                    case "Pix":
+                    case "PIX":
+                        response = await _paymentService.CreatePixPaymentAsync(request);
+                        break;
+
+                    case "boleto":
+                    case "Boleto":
+                    case "BOLETO":
+                        response = await _paymentService.CreateBoletoPaymentAsync(request);
+                        break;
+
+                    case "stripe":
+                    case "card":
+                    case "cartao":
+                        response = await _paymentService.InitiateStripeCheckout(request);
+                        break;
+
+                    default:
+                        return BadRequest(new { error = "Método de pagamento inválido." });
+                }
+
                 return Ok(response);
             }
             catch (Exception ex)

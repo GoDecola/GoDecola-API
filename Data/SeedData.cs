@@ -3,6 +3,7 @@ using GoDecola.API.Enums;
 using GoDecola.API.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace GoDecola.API.Data
 {
@@ -1088,10 +1089,140 @@ namespace GoDecola.API.Data
                             new TravelPackageMedia { FilePath = "/Medias/Images/TravelPackage/packageId_20E.jpg", UploadDate = DateTime.UtcNow, MimeType = "image/jpeg" },
                         }
                     },
+
                 });
+
+                await context.SaveChangesAsync();
             }
 
-            await context.SaveChangesAsync();
+            if (!context.Reservations.Any())
+            {
+                Console.WriteLine("Populando reservas, pagamentos e reviews..."); //teste - checar se está iniciando o metodo dps ds criação dos pacotes
+
+                var userIds = context.Users.Select(u => u.Id).ToList();
+                var travelPackages = context.TravelPackages.ToList();
+
+                if (!userIds.Any() || !travelPackages.Any())
+                {
+                    Console.WriteLine(" Não há usuários ou pacotes suficientes para gerar reservas."); // teste - checar no log se está esperando a criação dos users e dos pacotes antes de popular as reservas, pagamentos e reviews
+                    return;
+                }
+
+                var random = new Random();
+                var paymentMethods = new[] { "PIX", "Boleto", "Card" };
+                var reservationStatuses = new[] { "PENDING", "CONFIRMED", "CANCELLED" };
+                var paymentStatuses = new[] { "PENDING", "CONFIRMED", "FAILED" };
+                var sampleComments = new[]
+                {
+                    "Pacote incrível, super recomendo!",
+                    "Viagem sensacional, experiência única.",
+                    "Atendimento excelente, voltaria com certeza.",
+                    "Gostei do destino, tudo bem organizado.",
+                    "Vale cada centavo, muito bom!",
+                    "A hospedagem deixou a desejar, mas o resto compensou.",
+                    "Passeios maravilhosos e bem guiados.",
+                    "Transporte foi pontual, tudo certinho.",
+                    "Tive problemas com o hotel, mas foi resolvido.",
+                    "Fiquei encantado com o roteiro cultural.",
+                    "Ótimo custo-benefício.",
+                    "Experiência inesquecível, parabéns à agência.",
+                    "Achei o pacote bem completo.",
+                    "Atendimento ao cliente foi 10/10.",
+                    "Fácil de reservar, muito prático.",
+                    "Bateu exatamente com o que estava no site.",
+                    "Minhas fotos ficaram incríveis, lugares lindos.",
+                    "Já estou planejando a próxima com vocês.",
+                    "Bom para descansar, paisagens lindas.",
+                    "Adorei o guia, super gente boa.",
+                    "Me senti segura durante toda a viagem.",
+                    "Ótima escolha para famílias.",
+                    "Diversão garantida para todas as idades.",
+                    "Comida local excelente.",
+                    "Queria mais dias nesse paraíso!",
+                    "O cronograma foi respeitado do início ao fim.",
+                    "Check-in e check-out rápidos e fáceis.",
+                    "Viagem dos sonhos realizada!",
+                    "Melhor pacote que já comprei.",
+                    "Indico de olhos fechados.",
+                    "Top demais!"
+                };
+
+                var reservations = new List<Reservation>();
+
+                for (int i = 0; i < 30; i++)
+                {
+                    var userId = userIds[random.Next(userIds.Count)];
+                    var selectedPackage = travelPackages[random.Next(travelPackages.Count)];
+                    DateTime reservationDate = DateTime.UtcNow.AddDays(-random.Next(10, 300)).Date;
+                    string reservationStatus = reservationStatuses[random.Next(reservationStatuses.Length)];
+
+                    var reservation = new Reservation
+                    {
+                        UserId = userId,
+                        TravelPackageId = selectedPackage.Id,
+                        ReservationDate = reservationDate,
+                        Status = Enum.Parse<ReservationStatus>(reservationStatus, ignoreCase: true),
+                        TotalPrice = selectedPackage.Price,
+                        CheckInDate = reservationDate.AddDays(30),
+                        CheckOutDate = reservationDate.AddDays(35)
+                    };
+
+                    reservations.Add(reservation);
+                }
+
+                // Salvar reservas para garantir os IDs no banco
+                context.Reservations.AddRange(reservations);
+                context.SaveChanges();
+
+                var payments = new List<Payment>();
+                var reviews = new List<Review>();
+                var usedReviewCombos = new HashSet<(string userId, int travelPackageId)>();
+
+
+                foreach (var reservation in reservations)
+                {
+                    string paymentStatus = paymentStatuses[random.Next(paymentStatuses.Length)];
+                    string method = paymentMethods[random.Next(paymentMethods.Length)];
+
+                    var payment = new Payment
+                    {
+                        ReservationId = reservation.Id,
+                        Method = method,
+                        AmountPaid = reservation.TotalPrice,
+                        Status = Enum.Parse<PaymentStatus>(paymentStatus, ignoreCase: true).ToString(),
+                        PaymentDate = reservation.ReservationDate.AddHours(1),
+                        PixQrCode = method == "PIX" ? $"pix_qr_code_{reservation.Id}" : null,
+                        BoletoBarcode = method == "Boleto" ? $"boleto_bar_code_{reservation.Id}" : null
+                    };
+
+                    payments.Add(payment);
+
+                    var comboKey = ((string)reservation.UserId!, reservation.TravelPackageId);
+                    if (!usedReviewCombos.Contains(comboKey))
+                    {
+                        var review = new Review
+                        {
+                            ReservationId = reservation.Id,
+                            TravelPackageId = reservation.TravelPackageId,
+                            UserId = reservation.UserId,
+                            Rating = random.Next(3, 6),
+                            Comment = sampleComments[random.Next(sampleComments.Length)],
+                            ReviewDate = reservation.ReservationDate.AddDays(2)
+                        };
+
+                        reviews.Add(review);
+                        usedReviewCombos.Add(comboKey);
+                    }
+                }
+
+                // Fora do loop:
+                context.Payments.AddRange(payments);
+                context.Reviews.AddRange(reviews);
+                context.SaveChanges();
+
+                Console.WriteLine("Reservas, pagamentos e reviews populados com sucesso."); // teste - se aparecer no log, deu certo toda a inserção criada, se n aparecer o banco foi criado com erro
+            }
+        
         }
     }
 }
