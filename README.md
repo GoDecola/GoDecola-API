@@ -208,6 +208,7 @@ C --> I
 - Integração de pagamento Stripe
 - Git para versionamento
 - Swagger
+- Smtp4dev
 
 ## Instruções de uso
 
@@ -223,6 +224,11 @@ cd GoDecola-API
 ```bash
 dotnet run
 ```
+### Executar o Smtp4dev
+```
+smtp4dev
+```
+
 > 💡 Configure as chaves no **appsettings.json** para conexão com o banco de dados e API de pagamento.
 
 ## Licença
